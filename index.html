@@ -90,6 +90,16 @@ input.e:disabled,select.e:disabled{background:transparent;border-color:transpare
 .empty{padding:28px 16px;text-align:center;color:var(--muted)}
 .note{font-size:12.5px;color:var(--muted)}
 .alert{display:flex;gap:10px;padding:8px 12px;border-radius:5px;font-size:13px}
+.ia-lista{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow-y:auto;padding:4px 2px 10px}
+.ia-msg{max-width:min(760px,92%);padding:9px 12px;border-radius:10px;line-height:1.45;overflow-wrap:anywhere}
+.ia-msg p{margin:0 0 6px}.ia-msg p:last-child{margin:0}
+.ia-msg.eu{align-self:flex-end;background:var(--accent);color:#fff;white-space:pre-wrap}
+.ia-msg.ia{align-self:flex-start;background:var(--panel2);border:1px solid var(--line)}
+.ia-msg.erro{background:var(--bad-weak);color:var(--bad)}
+.ia-msg table{border-collapse:collapse;margin:6px 0;font-size:13px}.ia-msg td,.ia-msg th{border:1px solid var(--line);padding:3px 7px;text-align:left}
+.ia-sug{display:flex;flex-wrap:wrap;gap:6px}
+.ia-form{display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(--line);padding-top:10px}
+.ia-form textarea{flex:1;min-width:0;resize:vertical;font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}
 .alert.warn{background:var(--warn-weak);color:var(--warn)} .alert.bad{background:var(--bad-weak);color:var(--bad)} .alert.info{background:var(--accent-weak);color:var(--accent)}
 /* gantt */
 .gantt{position:relative}
@@ -167,7 +177,7 @@ const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, hist
   got:{obra:false, comp:false, orc:false, lanc:false}, canEdit:false, uid:null,
   tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'tabela', crTorre:'', crEt:'', crSt:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
 let db = null, user = null, M = null, assetsNS = null;
-const TABS = [['painel','Painel'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['contrat','Contratação'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
+const TABS = [['painel','Painel'],['ia','Perguntar à IA'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['contrat','Contratação'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
 
 // ---------- formatação
 const nf2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -462,7 +472,7 @@ function renderTop(){
   w.innerHTML = db ? (S.canEdit ? '<span class="pill p-ok">Edição liberada</span>' : '<span class="pill p-mut">Somente leitura</span>') : '';
 }
 function renderTabs(){
-  document.getElementById('tabs').innerHTML = TABS.map(([id, l]) => `<button role="tab" id="tab-${id}" aria-selected="${S.tab === id}" data-tab="${id}">${l}</button>`).join('');
+  document.getElementById('tabs').innerHTML = TABS.filter(([id]) => id !== 'ia' || window.__perguntar).map(([id, l]) => `<button role="tab" id="tab-${id}" aria-selected="${S.tab === id}" data-tab="${id}">${l}</button>`).join('');
 }
 
 // ---------- telas
@@ -829,6 +839,61 @@ function viewContrat(){
     <tr class="tot"><td colspan="5">Total da obra</td><td class="num">${K(tot.oMO)}</td><td class="num">${K(tot.oMAT)}</td><td class="num">${K(tot.oSV)}</td><td class="num">${K(to)}</td><td class="num">${K(tot.r)}</td><td class="num">${K(to - tot.r)}</td></tr></tbody></table></div></section>`;
 }
 
+// ---------- perguntar à IA (só na versão do site: window.__perguntar vem do supa.js)
+const n2 = v => nf2.format(v || 0), n0 = v => nf0.format(Math.round(v || 0));
+function resumoIA(){
+  const L = [], cfg = S.cfg || {};
+  L.push(`Obra: ${cfg.nome || 'Residencial Madrid'} · ${cfg.empresa || ''} · ${cfg.local || ''} · ${cfg.unidades || 60} unidades · área ${n2(cfg.area)} m² · referência de preços ${cfg.refPreco || ''}`);
+  L.push(`Custo sem BDI R$ ${n0(M.total)} (diretos ${n0(M.diretos)}, indiretos ${n0(M.indiretos)}) · meta sem BDI R$ ${n0(M.meta)} · BDI ${(M.bdi * 100).toFixed(2)}% · preço com BDI R$ ${n0(M.preco)}`);
+  L.push(`Realizado total R$ ${n0(M.real)} (medições ${n0(M.realM)}, compras ${n0(M.realC)}) · avanço físico ${(M.fis * 100).toFixed(1)}% · previsto para hoje ${(M.prevHj * 100).toFixed(1)}% · fim do cronograma ${br(M.fimObra)}`);
+  L.push('', '## Pacotes de contratação (orçado sem BDI; serviços: código | descrição | un | quantidade | MO por un. | material por un. | MO total | material total | serviços | total)');
+  const PK = pacotes(); const gN = Object.fromEntries(GRUPOS);
+  for (const [k] of PACOTES) { const p = PK[k]; if (!p) continue; const o = p.oMO + p.oMAT + p.oSV;
+    L.push(`### ${PAC[k].nome} [${gN[PAC[k].g]}] — orçado ${n0(o)} (MO ${n0(p.oMO)}, material ${n0(p.oMAT)}, serviços ${n0(p.oSV)}) · realizado ${n0(p.r)} · saldo ${n0(o - p.r)}${PAC[k].nota ? ' · ' + PAC[k].nota : ''}`);
+    for (const l of [...p.lin.values()].sort((a, b) => (b.mo + b.mat + b.sv) - (a.mo + a.mat + a.sv))) {
+      const q = l.q || 0; L.push(`- ${l.c} | ${String(l.desc).slice(0, 110)} | ${l.unid} | ${n2(q)} | ${q ? n2(l.mo / q) : '-'} | ${q ? n2(l.mat / q) : '-'} | ${n0(l.mo)} | ${n0(l.mat)} | ${n0(l.sv)} | ${n0(l.mo + l.mat + l.sv)} | ${[...l.trs].join(',')}`);
+    }
+  }
+  L.push('', '## Etapas (orçado | realizado)');
+  for (const e of Object.values(M.etapas).sort((a, b) => a.n - b.n)) L.push(`${pad(e.n)} ${e.nome} | ${n0(e.total)} | ${n0(e.real)}`);
+  L.push('', '## Cronograma (id | etapa | atividade | torre | início | fim | dias | % executado | situação | folga dias | crítica | início real | fim real | custo previsto)');
+  const st = { ok:'concluída', bad:'atrasada', cur:'em andamento', fut:'a iniciar' };
+  for (const a of M.ats) L.push(`${a.id} | ${a.et || ''} | ${a.nome || ''} | ${a.tr || ''} | ${br(a.ini)} | ${br(a.fim)} | ${a.dc} | ${Math.round((a.pct || 0) * 100)}% | ${st[a.st] || a.st} | ${a.folga} | ${a.crit ? 'sim' : ''} | ${br(a.iniR)} | ${br(a.fimR)} | ${n0(a.cost)}`);
+  L.push('', '## Realizado lançado (data | tipo | documento | descrição | fornecedor | subetapa | categoria | valor)');
+  for (const x of M.lanc) L.push(`${br(x.l.data)} | ${x.l.tp === 'M' ? 'medição' : 'compra'} | ${x.l.doc || ''} | ${x.l.d || ''} | ${x.l.fo || ''} | ${x.sb} | ${x.cat === 'MIX' ? 'MO+material' : catNome(x.cat)} | ${n2(x.l.v)}`);
+  L.push('', '## Físico-financeiro mensal (mês | previsto | realizado)');
+  for (const mm of M.meses) L.push(`${mesLab(mm)} | ${n0(M.ffTot[mm])} | ${n0(M.realMes[mm] || 0)}`);
+  L.push('', `Hoje é ${br(today())} (${today()}).`);
+  return L.join('\n');
+}
+function mdLeve(t){
+  const ls = esc(t).split('\n'); let out = '', tab = [];
+  const flush = () => { if (!tab.length) return; const rows = tab.filter(l => !/^\|?\s*:?-{2,}/.test(l.replace(/^\|\s*/, '|'))).map(l => l.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
+    out += `<div class="scroll"><table>${rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${c}</td>` : `<th>${c}</th>`).join('')}</tr>`).join('')}</table></div>`; tab = []; };
+  for (const l of ls) { if (/^\s*\|/.test(l)) { tab.push(l.trim()); continue; } flush(); if (l.trim()) out += `<p>${l.replace(/^#{1,4}\s*(.+)$/, '<b>$1</b>').replace(/^\s*[-*]\s+/, '• ')}</p>`; }
+  flush();
+  return out.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+}
+function viewIA(){
+  const msgs = S.chat || [];
+  const sug = ['Quanto o orçamento prevê de mão de obra por m² na pintura interna?', 'Quais atividades estão atrasadas e quanto?', 'Quanto já foi gasto na estrutura e quanto falta?', 'Qual pacote está com o realizado acima do orçado?'];
+  const lista = msgs.map(m => `<div class="ia-msg ${m.role === 'user' ? 'eu' : 'ia'}${m.erro ? ' erro' : ''}">${m.role === 'user' ? esc(m.content) : mdLeve(m.content)}</div>`).join('');
+  return `<section class="card"><header><h2>Perguntar à IA</h2><span class="note">Responde com os dados desta obra que estão no app: orçamento, pacotes de contratação, cronograma e realizado. Ela só consulta, não altera nada. Confira os números antes de fechar um contrato.</span>${msgs.length ? '<span class="sp"></span><button class="btn" data-act="ia-limpar">Nova conversa</button>' : ''}</header>
+   <div class="body"><div class="ia-lista" id="ia-lista" aria-live="polite">${lista || `<div class="note">Algumas perguntas para começar:</div><div class="ia-sug">${sug.map(s => `<button class="btn sm" data-iasug="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}${S.chatBusy ? '<div class="ia-msg ia muted">Pensando…</div>' : ''}</div>
+   <form class="ia-form" data-iaform><textarea id="ia-txt" rows="2" aria-label="Sua pergunta" placeholder="Escreva sua pergunta sobre a obra (Enter envia; Shift+Enter quebra a linha)" ${S.chatBusy ? 'disabled' : ''}>${esc(S.iaRascunho || '')}</textarea><button class="btn pri" type="submit" ${S.chatBusy ? 'disabled' : ''}>Enviar</button></form></div></section>`;
+}
+async function perguntarIA(texto){
+  texto = String(texto || '').trim(); if (!texto || S.chatBusy || !window.__perguntar || !M) return;
+  S.chat = [...(S.chat || []), { role: 'user', content: texto }]; S.iaRascunho = ''; S.chatBusy = true; render();
+  let r; try { r = await window.__perguntar(S.chat.filter(m => !m.erro).slice(-12).map(({ role, content }) => ({ role, content })), resumoIA()); } catch (e) { r = null; }
+  S.chatBusy = false;
+  if (r && r.texto) S.chat.push({ role: 'assistant', content: r.texto });
+  else S.chat.push({ role: 'assistant', content: (r && r.erro) || 'Não foi possível falar com a IA. Tente de novo.', erro: true });
+  await render();
+  const el = document.getElementById('ia-lista'); if (el) el.scrollTop = el.scrollHeight;
+  const tx = document.getElementById('ia-txt'); if (tx) tx.focus();
+}
+
 async function viewHist(){
   const es = []; for (const d of Object.values(S.hist)) for (const [id, e] of Object.entries(d.l || {})) es.push(e);
   es.sort((a, b) => (b.t || '').localeCompare(a.t || ''));
@@ -944,6 +1009,7 @@ async function render(){
     case 'cronograma': h = viewCrono(); break;
     case 'ff': h = viewFF(); break;
     case 'contrat': h = viewContrat(); break;
+    case 'ia': h = viewIA(); break;
     case 'realizado': h = viewReal(); break;
     case 'historico': h = await viewHist(); if (seq !== renderSeq) return; break;
   }
@@ -1116,7 +1182,13 @@ let bt; document.addEventListener('input', ev => {
   if (ev.target.id === 'busca') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.q = v; render(); }, 250); }
   if (ev.target.id === 'buscaIns') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.insQ = v; render(); }, 250); }
 });
-document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.hasAttribute('data-novafoto')) enviarFotos(ev.target); else aoEnviar(ev.target); });
+document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.hasAttribute('data-iaform')) perguntarIA(S.iaRascunho || ''); else if (ev.target.hasAttribute('data-novafoto')) enviarFotos(ev.target); else aoEnviar(ev.target); });
+document.addEventListener('input', ev => { if (ev.target.id === 'ia-txt') S.iaRascunho = ev.target.value; });
+document.addEventListener('keydown', ev => { if (ev.target.id === 'ia-txt' && ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); perguntarIA(ev.target.value); } });
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-iasug],[data-act="ia-limpar"]'); if (!b) return;
+  if (b.dataset.iasug) perguntarIA(b.dataset.iasug); else { S.chat = []; S.iaRascunho = ''; render(); }
+});
 
 // ---------- início
 async function boot(){

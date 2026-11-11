@@ -13,6 +13,13 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const erro = (e, code) => Object.assign(new Error((e && e.message) || String(e)), { code: code || (e && e.code) || 'upstream_error' });
   window.__fotoUrl = id => urls[id] || '';
+  // chat de IA: função "perguntar" do Supabase (o token de login vai junto automaticamente)
+  window.__perguntar = async (mensagens, contexto) => {
+    const { data, error } = await sb.functions.invoke('perguntar', { body: { mensagens, contexto } });
+    if (!error) return data || { erro: 'Resposta vazia.' };
+    try { const j = await error.context.json(); if (j && j.erro) return { erro: j.erro }; } catch (e) {}
+    return { erro: 'Não foi possível falar com a IA. Confira a internet e tente de novo.' };
+  };
 
   // ---------- estilos das telas próprias (login, conta, equipe)
   const css = document.createElement('style');
