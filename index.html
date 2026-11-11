@@ -141,6 +141,54 @@ input.e:disabled,select.e:disabled{background:transparent;border-color:transpare
 .lb .nav{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:16px;display:flex;gap:8px}
 .lb .nav .btn{background:#1A2226;color:#E4EAEC;border-color:#2F3B41}
 @media (max-width:900px){ .top{position:static} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+/* cronograma visual */
+.cr-res{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.cr-res button{text-align:left;border:1px solid var(--line);border-left-width:5px;border-radius:6px;background:var(--panel);padding:8px 10px;cursor:pointer;color:var(--ink)}
+.cr-res button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent)}
+.cr-res .n{font:700 22px/1.1 var(--f-data)} .cr-res .t{font-size:12px;color:var(--muted)}
+.cr-res .st-bad{border-left-color:var(--bad)} .cr-res .st-cur{border-left-color:var(--accent)} .cr-res .st-fut{border-left-color:var(--muted)} .cr-res .st-ok{border-left-color:var(--ok)} .cr-res .st-conc{border-left-color:#C9741A}
+.cr-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cr-nav b{font-size:15px;margin-left:6px}
+.cr-semana{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cr-dia{border:1px solid var(--line);border-radius:6px;padding:6px;min-height:96px;background:var(--panel);min-width:0}
+.cr-dia.hoje{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.cr-dia.fds{background:var(--panel2)}
+.cr-dn{font-size:12px;color:var(--muted);margin-bottom:4px}.cr-dn b{color:var(--ink);font-size:14px}
+.cr-ev{font-size:12px;line-height:1.3;padding:2px 5px;border-radius:4px;margin-top:3px;overflow-wrap:anywhere}
+.cr-ev.conc{background:#F6E2C8;color:#7A3F00;font-weight:700} .cr-ev.ini{background:var(--accent-weak);color:var(--accent)} .cr-ev.fim{background:var(--ok-weak);color:var(--ok)} .cr-ev.marco{background:var(--bad-weak);color:var(--bad);font-weight:700}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .cr-ev.conc{background:#4A2E10;color:#F4C58E} }
+:root[data-theme="dark"] .cr-ev.conc{background:#4A2E10;color:#F4C58E}
+.cr-grupo{margin-top:16px}.cr-grupo h3{font-size:14px;margin:0 0 8px;display:flex;gap:8px;align-items:center}
+.cr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:8px}
+.cr-at{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:6px;padding:8px 10px;background:var(--panel);display:flex;flex-direction:column;gap:5px;min-width:0}
+.cr-at.st-bad{border-left-color:var(--bad)} .cr-at.st-cur{border-left-color:var(--accent)} .cr-at.st-ok{border-left-color:var(--ok)}
+.cr-at .nm{font-weight:600;line-height:1.3}
+.cr-at .dt{font-size:12.5px;color:var(--muted)}
+.cr-mini{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cr-mini i{height:8px;border-radius:2px;background:var(--panel2)}
+.cr-mini i.on{background:var(--bar)} .cr-mini i.conc{background:#C9741A}
+.cr-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cr-cal .h{font-size:11px;font-weight:700;color:var(--muted);text-align:center;text-transform:uppercase}
+.cr-cal button.d{border:1px solid var(--line);border-radius:5px;background:var(--panel);min-height:78px;padding:4px;text-align:left;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;gap:2px;min-width:0;font:inherit}
+.cr-cal button.d.fora{opacity:.4} .cr-cal button.d.hoje{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)} .cr-cal button.d[aria-pressed="true"]{outline:2px solid var(--accent)}
+.cr-cal .dn{font-weight:700;font-size:13px}
+.cr-cal .cr-ev{margin-top:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-g{position:relative}
+.cr-gl{display:grid;grid-template-columns:minmax(150px,32%) 1fr;align-items:center;border-bottom:1px solid var(--line);min-height:30px}
+.cr-gl .cr-lb{padding:4px 8px;font:13px/1.25 var(--f-data);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-gl.et{background:var(--panel2);cursor:pointer}.cr-gl.et .cr-lb{font:700 13px var(--f-ui)}
+.cr-tk{position:relative;height:30px}
+.cr-tk .b{position:absolute;top:8px;height:14px;border-radius:3px;background:var(--muted);opacity:.85;overflow:hidden;min-width:3px}
+.cr-tk .b.st-bad{background:var(--bad)} .cr-tk .b.st-cur{background:var(--accent)} .cr-tk .b.st-ok{background:var(--ok)} .cr-tk .b.st-fut{background:var(--bar)}
+.cr-tk .b i{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.35)}
+.cr-tk .cc{position:absolute;top:9px;width:9px;height:9px;background:#C9741A;transform:translateX(-50%) rotate(45deg);border:1px solid var(--panel)}
+.cr-tk .hj{position:absolute;top:0;bottom:0;width:2px;background:var(--bad);opacity:.8}
+.cr-tk .m{position:absolute;top:0;bottom:0;border-left:1px dashed var(--line)}
+.cr-gh{display:grid;grid-template-columns:minmax(150px,32%) 1fr;position:sticky;top:0;background:var(--panel2);z-index:2;border-bottom:1px solid var(--line)}
+.cr-gh .cr-tk{height:24px}.cr-gh .ml{position:absolute;top:4px;font:600 11px var(--f-ui);color:var(--muted);transform:translateX(3px);white-space:nowrap}
+.cr-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}.cr-leg i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.cr-marcos{display:flex;flex-wrap:wrap;gap:6px}
+.cr-cal .pts{display:none;gap:2px;flex-wrap:wrap}.cr-cal .pts i{width:7px;height:7px;border-radius:50%;background:var(--accent)}.cr-cal .pts i.conc{background:#C9741A}
+@media (max-width:640px){ .cr-semana{grid-template-columns:1fr} .cr-dia{min-height:0} .cr-cal button.d{min-height:56px} .cr-cal .cr-ev{display:none} .cr-cal .pts{display:flex} .cr-gl,.cr-gh{grid-template-columns:110px 1fr} }
 @media (max-width:640px){ .kpi .v{font-size:16px} .g-row,.g-head{grid-template-columns:150px 1fr} td.desc{min-width:200px} }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -175,7 +223,7 @@ input.e:disabled,select.e:disabled{background:transparent;border-color:transpare
 // ---------- estado
 const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, hist:{},
   got:{obra:false, comp:false, orc:false, lanc:false}, canEdit:false, uid:null,
-  tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'tabela', crTorre:'', crEt:'', crSt:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
+  tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'semana', crTorre:'', crEt:'', crSt:'', crRef:'', crQ:'', crConc:false, crDia:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
 let db = null, user = null, M = null, assetsNS = null;
 const TABS = [['painel','Painel'],['ia','Perguntar à IA'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['contrat','Contratação'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
 
@@ -656,20 +704,151 @@ function viewIns(){
    ${S.canEdit ? `<form class="body form" data-novoins style="border-top:1px solid var(--line)"><label>Código<input name="c" required placeholder="P-070"></label><label class="wide">Descrição<input name="d" required></label><label>Unid<input name="u" required></label><label>Preço (R$)<input name="p" inputmode="decimal" required></label><label>Base do preço<input name="b" placeholder="Cotação, fornecedor, data"></label><div><button class="btn pri">Cadastrar insumo</button></div></form>` : ''}</section>`;
 }
 
-function viewCrono(){
+// ---------- cronograma visual: semana, mês, geral e tabela
+const stL = { ok:'Concluída', bad:'Atrasada', cur:'Em execução', fut:'A executar' }, stC = { ok:'p-ok', bad:'p-bad', cur:'p-acc', fut:'p-mut' };
+const DOW = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const segunda = s => { const d = D(s); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return isoD(d); };
+const brL = s => s ? s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) : '';
+const ddmm = s => s.slice(8, 10) + '/' + s.slice(5, 7);
+const sobre = (a, s, e) => a.ini <= e && a.fim >= s;
+// datas de concretagem: lidas do nome da atividade ("2 concretagens (16/11 e 18/11)"); se o nome estiver desatualizado, usa as datas da atividade
+function concretagens(a){
+  if (a._cc) return a._cc;
+  const nm = String(a.nome || ''); const n = etN(a.et);
+  const ehConc = /concretag/i.test(nm) || (n === 5 && /beiral|platibanda|escada/i.test(nm));
+  if (!ehConc) return (a._cc = []);
+  const rot = /radier/i.test(nm) ? `Radier ${a.tr}` : /beiral|platibanda|escada/i.test(nm) ? `${a.tr} beiral, platibanda e escada` : (nm.match(/^(T\d)\s+Pav\s*(\d+)/) ? nm.replace(/^(T\d)\s+Pav\s*(\d+).*$/, '$1 Pav $2') : `${a.tr} ${a.id}`);
+  const ds = [];
+  for (const m of nm.matchAll(/(\d{2})\/(\d{2})/g)) {
+    let best = null;
+    for (const y of [+a.ini.slice(0, 4) - 1, +a.ini.slice(0, 4), +a.ini.slice(0, 4) + 1]) { const s = y + '-' + m[2] + '-' + m[1]; if (s >= addDays(a.ini, -2) && s <= addDays(a.fim, 2)) best = s; }
+    if (best) ds.push(best);
+  }
+  if (!ds.length) { if (/2 concretagens/i.test(nm) && a.ini !== a.fim) ds.push(a.ini, a.fim); else ds.push(a.fim); }
+  return (a._cc = [...new Set(ds)].sort().map((d, i, arr) => ({ d, a, rot: rot + (arr.length > 1 ? ` (${i + 1}ª de ${arr.length})` : '') })));
+}
+function marcos(l){
+  const out = [];
+  for (const t of ['T1', 'T2', 'T3']) {
+    const est = l.filter(a => a.tr === t && etN(a.et) === 5); if (est.length) out.push({ d: est.reduce((m, a) => a.fim > m ? a.fim : m, '0'), t: `Fim da estrutura ${t}` });
+    const hab = l.filter(a => a.tr === t && /habite/i.test((a.sub || '') + ' ' + a.nome)); if (hab.length) out.push({ d: hab.reduce((m, a) => a.fim > m ? a.fim : m, '0'), t: `Habite-se ${t}` });
+  }
+  if (M.fimObra && M.fimObra !== '0000') out.push({ d: M.fimObra, t: 'Fim da obra' });
+  return out.sort((x, y) => x.d.localeCompare(y.d));
+}
+function crFiltrar(semSt){
   let l = M.ats;
   if (S.crTorre) l = l.filter(a => a.tr === S.crTorre);
   if (S.crEt) l = l.filter(a => String(etN(a.et)) === S.crEt);
-  if (S.crSt) l = l.filter(a => S.crSt === 'crit' ? a.crit : a.st === S.crSt);
-  const torres = [...new Set(M.ats.map(a => a.tr))].sort();
-  const ets = [...new Set(M.ats.map(a => etN(a.et)))].sort((a, b) => a - b);
-  const stL = { ok:'Concluída', bad:'Atrasada', cur:'Em curso', fut:'A iniciar' }, stC = { ok:'p-ok', bad:'p-bad', cur:'p-acc', fut:'p-mut' };
-  const filtros = `<div class="f"><div class="sw" role="group" aria-label="Visualização"><button data-crv="tabela" aria-pressed="${S.crView === 'tabela'}">Tabela</button><button data-crv="gantt" aria-pressed="${S.crView === 'gantt'}">Gantt</button></div>
-    <select id="crTorre" aria-label="Torre"><option value="">Todas as torres</option>${torres.map(t => `<option ${S.crTorre === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
-    <select id="crEt" aria-label="Etapa"><option value="">Todas as etapas</option>${ets.map(n => `<option value="${n}" ${S.crEt == n ? 'selected' : ''}>Etapa ${n}</option>`).join('')}</select>
-    <select id="crSt" aria-label="Situação"><option value="">Todas as situações</option>${[['bad','Atrasadas'],['cur','Em curso'],['fut','A iniciar'],['ok','Concluídas'],['crit','Caminho crítico']].map(([v, t]) => `<option value="${v}" ${S.crSt === v ? 'selected' : ''}>${t}</option>`).join('')}</select></div>`;
+  if (S.crQ) { const q = S.crQ.toLowerCase(); l = l.filter(a => [a.id, a.nome, a.sub, a.et, a.tr].join(' ').toLowerCase().includes(q)); }
+  if (S.crConc) l = l.filter(a => concretagens(a).length);
+  if (!semSt && S.crSt) l = l.filter(a => S.crSt === 'crit' ? a.crit : a.st === S.crSt);
+  return l;
+}
+const ordSt = { bad:0, cur:1, fut:2, ok:3 };
+function atrasoTxt(a){
+  const hj = today();
+  if (a.st !== 'bad') return '';
+  if (hj > a.fim) return `<b style="color:var(--bad)">${diff(a.fim, hj)} dias de atraso</b> (devia ter terminado em ${ddmm(a.fim)})`;
+  return `<b style="color:var(--bad)">abaixo do previsto</b>: ${Math.round((a.pct || 0) * 100)}% feito, o esperado hoje era ${Math.round(a.prev * 100)}%`;
+}
+function cardAt(a, dias){
+  const cc = new Set(concretagens(a).map(c => c.d)); const pc = Math.round((a.pct || 0) * 100);
+  return `<div class="cr-at st-${a.st}"><div class="f" style="gap:6px"><span class="pill ${stC[a.st]}">${stL[a.st]}</span><span class="pill p-mut">${esc(a.tr)}</span>${cc.size ? '<span class="pill" style="background:#F6E2C8;color:#7A3F00">concretagem</span>' : ''}${a.crit && a.st !== 'ok' ? '<span class="pill p-warn" title="Se atrasar, atrasa o fim da obra">crítica</span>' : ''}</div>
+    <div class="nm">${esc(a.nome)}</div>
+    <div class="dt">${brL(a.ini)} → ${brL(a.fim)} · ${a.dc} ${a.dc === 1 ? 'dia' : 'dias'} · ${pc}% feito${cc.size ? ' · concreta em ' + [...cc].map(ddmm).join(' e ') : ''}</div>
+    ${a.st === 'bad' ? `<div class="dt">${atrasoTxt(a)}</div>` : ''}
+    ${dias ? `<div class="cr-mini" aria-hidden="true">${dias.map(d => `<i class="${d >= a.ini && d <= a.fim ? 'on' : ''}${cc.has(d) ? ' conc' : ''}"></i>`).join('')}</div>` : ''}
+    <div class="bar" title="${pc}% feito"><i style="width:${pc}%;background:var(--bar-done)"></i></div></div>`;
+}
+function grupos(l, dias){
+  const tit = { bad:'⚠ Atrasadas', cur:'Em execução', fut:'A executar', ok:'Concluídas' };
+  return ['bad', 'cur', 'fut', 'ok'].map(st => { const g = l.filter(a => a.st === st).sort((x, y) => x.ini.localeCompare(y.ini)); if (!g.length) return '';
+    return `<div class="cr-grupo"><h3>${tit[st]} <span class="pill ${stC[st]}">${g.length}</span></h3><div class="cr-cards">${g.map(a => cardAt(a, dias)).join('')}</div></div>`; }).join('');
+}
+function eventosDia(l, d){
+  const ev = [];
+  for (const a of l) {
+    for (const c of concretagens(a)) if (c.d === d) ev.push({ t:'conc', x:'Concretagem ' + c.rot, a });
+    if (a.ini === d && a.fim !== d && !concretagens(a).some(c => c.d === d)) ev.push({ t:'ini', x:'Começa: ' + a.nome, a });
+    if (a.fim === d && a.ini !== d && !concretagens(a).some(c => c.d === d)) ev.push({ t:'fim', x:'Termina: ' + a.nome, a });
+  }
+  for (const m of marcos(M.ats)) if (m.d === d) ev.push({ t:'marco', x:'★ ' + m.t });
+  return ev;
+}
+function crSemana(l){
+  const hj = today(), s = segunda(S.crRef || hj), e = addDays(s, 6); const dias = [...Array(7)].map((_, i) => addDays(s, i));
+  const nav = `<div class="cr-nav"><button class="btn" data-crmv="-7" aria-label="Semana anterior">‹ Anterior</button><button class="btn" data-crmv="0">Esta semana</button><button class="btn" data-crmv="7" aria-label="Próxima semana">Próxima ›</button><b>Semana de ${ddmm(s)} a ${brL(e)}</b></div>`;
+  const tira = `<div class="cr-semana" style="margin-top:10px">${dias.map((d, i) => { const ev = eventosDia(l, d);
+    return `<div class="cr-dia${d === hj ? ' hoje' : ''}${i > 4 ? ' fds' : ''}"><div class="cr-dn">${DOW[i]} <b>${ddmm(d)}</b>${d === hj ? ' · hoje' : ''}</div>${ev.map(x => `<div class="cr-ev ${x.t}" title="${esc(x.x)}">${esc(x.x)}</div>`).join('') || '<div class="note">—</div>'}</div>`; }).join('')}</div>`;
+  const doPeriodo = l.filter(a => sobre(a, s, e) || (s <= hj && hj <= e && a.st === 'bad'));
+  return nav + tira + (doPeriodo.length ? grupos(doPeriodo, dias) : '<div class="empty">Nada previsto nesta semana com esses filtros.</div>');
+}
+function crMes(l){
+  const hj = today(), ref = (S.crRef || hj).slice(0, 7), m0 = ref + '-01', m1 = lastDay(ref);
+  const g0 = segunda(m0); let g1 = addDays(segunda(m1), 6);
+  const nav = `<div class="cr-nav"><button class="btn" data-crmes="-1" aria-label="Mês anterior">‹ Anterior</button><button class="btn" data-crmv="0">Este mês</button><button class="btn" data-crmes="1" aria-label="Próximo mês">Próximo ›</button><b>${['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][+ref.slice(5) - 1]} de ${ref.slice(0, 4)}</b></div>`;
+  let cel = ''; for (let d = g0; d <= g1; d = addDays(d, 1)) { const ev = eventosDia(l, d); const fora = d < m0 || d > m1;
+    cel += `<button class="d${fora ? ' fora' : ''}${d === hj ? ' hoje' : ''}" data-crdia="${d}" aria-pressed="${S.crDia === d}" aria-label="${brL(d)}: ${ev.length} eventos"><span class="dn">${+d.slice(8)}</span>${ev.slice(0, 3).map(x => `<span class="cr-ev ${x.t}">${esc(x.x)}</span>`).join('')}${ev.length > 3 ? `<span class="note">+${ev.length - 3}</span>` : ''}<span class="pts">${ev.slice(0, 6).map(x => `<i class="${x.t === 'conc' ? 'conc' : ''}"></i>`).join('')}</span></button>`; }
+  const cal = `<div class="cr-cal" style="margin-top:10px">${DOW.map(d => `<div class="h">${d}</div>`).join('')}${cel}</div>`;
+  let dia = '';
+  if (S.crDia) { const ev = eventosDia(l, S.crDia); const ativ = l.filter(a => a.ini <= S.crDia && a.fim >= S.crDia);
+    dia = `<div class="cr-grupo"><h3>${brL(S.crDia)}</h3>${ev.length ? `<div class="f" style="gap:6px">${ev.map(x => `<span class="cr-ev ${x.t}" style="display:inline-block">${esc(x.x)}</span>`).join('')}</div>` : ''}<div class="note" style="margin:8px 0">${ativ.length} ${ativ.length === 1 ? 'atividade' : 'atividades'} acontecendo neste dia:</div><div class="cr-cards">${ativ.sort((x, y) => ordSt[x.st] - ordSt[y.st]).map(a => cardAt(a)).join('')}</div></div>`; }
+  const doMes = l.filter(a => sobre(a, m0, m1) || (m0 <= hj && hj <= m1 && a.st === 'bad'));
+  return nav + cal + dia + (doMes.length ? `<div class="cr-grupo"><h3>Atividades do mês</h3>${ganttLista(doMes, m0, m1, true)}</div>` : '<div class="empty">Nada previsto neste mês com esses filtros.</div>');
+}
+// barras proporcionais (sem rolagem lateral): período [p0, p1]
+function ganttLista(l, p0, p1, plano){
+  const tot = diff(p0, p1) + 1, x = d => Math.max(0, Math.min(100, diff(p0, d) / tot * 100)), hj = today();
+  let marcas = ''; if (tot > 45) { let mm = p0.slice(0, 7); while (mm <= p1.slice(0, 7)) { const s = mm + '-01' < p0 ? p0 : mm + '-01'; marcas += `<div class="m" style="left:${x(s)}%"></div>`; mm = nextMes(mm); } }
+  else { for (let d = segunda(p0); d <= p1; d = addDays(d, 7)) if (d >= p0) marcas += `<div class="m" style="left:${x(d)}%"></div>`; }
+  const hjl = hj >= p0 && hj <= p1 ? `<div class="hj" style="left:${x(hj)}%" title="Hoje"></div>` : '';
+  const head = (() => { let h = ''; if (tot > 45) { let mm = p0.slice(0, 7); while (mm <= p1.slice(0, 7)) { const s = mm + '-01' < p0 ? p0 : mm + '-01'; h += `<span class="ml" style="left:${x(s)}%">${mesLab(mm)}</span>`; mm = nextMes(mm); } } else { for (let d = segunda(p0); d <= p1; d = addDays(d, 7)) if (d >= p0) h += `<span class="ml" style="left:${x(d)}%">${ddmm(d)}</span>`; } return `<div class="cr-gh"><div class="cr-lb note" style="padding:4px 8px">Atividade</div><div class="cr-tk">${h}</div></div>`; })();
+  const barra = a => { const s = a.ini < p0 ? p0 : a.ini, e = a.fim > p1 ? p1 : a.fim; const pc = Math.round((a.pct || 0) * 100);
+    return `<div class="b st-${a.st}" style="left:${x(s)}%;width:${Math.max(0.6, (diff(s, e) + 1) / tot * 100)}%" title="${esc(a.nome)} · ${brL(a.ini)} a ${brL(a.fim)} · ${pc}% · ${stL[a.st]}"><i style="width:${pc}%"></i></div>${concretagens(a).filter(c => c.d >= p0 && c.d <= p1).map(c => `<span class="cc" style="left:${x(c.d) + 0.5 / tot * 100}%" title="Concretagem ${esc(c.rot)} · ${brL(c.d)}"></span>`).join('')}`; };
+  const linha = (a, pad) => `<div class="cr-gl"><div class="cr-lb" title="${esc(a.nome)}" style="${pad ? 'padding-left:20px' : ''}">${a.tr !== 'Geral' && !String(a.nome).startsWith(a.tr) ? esc(a.tr) + ' · ' : ''}${esc(a.nome)}</div><div class="cr-tk">${marcas}${hjl}${barra(a)}</div></div>`;
   let corpo;
-  if (S.crView === 'gantt') corpo = gantt(l);
+  if (plano) corpo = l.slice().sort((p, q) => p.ini.localeCompare(q.ini)).map(a => linha(a)).join('');
+  else {
+    const ets = {}; for (const a of l) (ets[etN(a.et)] || (ets[etN(a.et)] = { nome: a.et, at: [] })).at.push(a);
+    corpo = Object.keys(ets).map(Number).sort((p, q) => p - q).map(n => { const g = ets[n], ab = S.open['cg' + n];
+      const i0 = g.at.reduce((m, a) => a.ini < m ? a.ini : m, '9999'), f0 = g.at.reduce((m, a) => a.fim > m ? a.fim : m, '0');
+      const peso = g.at.reduce((s, a) => s + (a.dc || 1), 0), feito = g.at.reduce((s, a) => s + (a.dc || 1) * Math.min(1, a.pct || 0), 0); const pc = Math.round(feito / peso * 100);
+      const st = g.at.some(a => a.st === 'bad') ? 'bad' : g.at.every(a => a.st === 'ok') ? 'ok' : g.at.some(a => a.st === 'cur') ? 'cur' : 'fut';
+      const nb = g.at.filter(a => a.st === 'bad').length;
+      return `<div class="cr-gl et" data-tog="cg${n}" aria-expanded="${!!ab}"><div class="cr-lb">${ab ? '▾' : '▸'} ${esc(g.nome)} <small class="muted">${pc}%${nb ? ` · <span style="color:var(--bad)">${nb} atrasada${nb > 1 ? 's' : ''}</span>` : ''}</small></div><div class="cr-tk">${marcas}${hjl}<div class="b st-${st}" style="left:${x(i0 < p0 ? p0 : i0)}%;width:${Math.max(0.6, (diff(i0 < p0 ? p0 : i0, f0 > p1 ? p1 : f0) + 1) / tot * 100)}%" title="${esc(g.nome)} · ${brL(i0)} a ${brL(f0)} · ${pc}%"><i style="width:${pc}%"></i></div>${g.at.flatMap(a => concretagens(a)).filter(c => c.d >= p0 && c.d <= p1).map(c => `<span class="cc" style="left:${x(c.d)}%" title="Concretagem ${esc(c.rot)} · ${brL(c.d)}"></span>`).join('')}</div></div>
+        ${ab ? g.at.slice().sort((p, q) => p.ini.localeCompare(q.ini)).map(a => linha(a, true)).join('') : ''}`; }).join('');
+  }
+  return `<div class="cr-g">${head}${corpo}</div><div class="cr-leg" style="margin-top:8px"><span><i style="background:var(--ok)"></i>Concluída</span><span><i style="background:var(--accent)"></i>Em execução</span><span><i style="background:var(--bad)"></i>Atrasada</span><span><i style="background:var(--bar)"></i>A executar</span><span><i style="background:#C9741A;transform:rotate(45deg);width:9px;height:9px"></i>Concretagem</span><span><i style="background:var(--bad);width:2px"></i>Hoje</span><span>Parte clara da barra = % feito</span></div>`;
+}
+function crGeral(l){
+  const ms = marcos(crFiltrar(true));
+  const hj = today(); const prox = M.ats.flatMap(a => concretagens(a)).filter(c => c.d >= hj).sort((p, q) => p.d.localeCompare(q.d)).slice(0, 6);
+  return `<div class="cr-grupo" style="margin-top:0"><h3>Marcos</h3><div class="cr-marcos">${ms.map(m => `<span class="pill ${m.d < hj ? 'p-ok' : 'p-mut'}" style="font-size:13px">${esc(m.t)}: <b>${brL(m.d)}</b></span>`).join('')}</div></div>
+   ${prox.length ? `<div class="cr-grupo"><h3>Próximas concretagens</h3><div class="cr-marcos">${prox.map(c => `<span class="cr-ev conc" style="display:inline-block;font-size:13px">${ddmm(c.d)} (${DOW[(D(c.d).getDay() + 6) % 7].toLowerCase()}) · ${esc(c.rot)}</span>`).join('')}</div></div>` : ''}
+   <div class="cr-grupo"><h3>Cronograma geral <span class="note" style="font-weight:400">clique numa etapa para abrir as atividades</span><span class="sp" style="flex:1"></span><button class="btn sm" data-act="cg-abrir">Abrir todas</button><button class="btn sm" data-act="cg-fechar">Fechar todas</button></h3>
+   ${l.length ? ganttLista(l, M.iniObra, M.fimObra, false) : '<div class="empty">Nenhuma atividade com esses filtros.</div>'}</div>`;
+}
+function viewCrono(){
+  const base = crFiltrar(true); const l = crFiltrar(false); const hj = today();
+  const torres = [...new Set(M.ats.map(a => a.tr))].sort((a, b) => a === 'Geral' ? 1 : b === 'Geral' ? -1 : a.localeCompare(b));
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n).filter(e => M.ats.some(a => etN(a.et) === e.n));
+  const cnt = st => base.filter(a => a.st === st).length;
+  const proxC = M.ats.flatMap(a => concretagens(a)).filter(c => c.d >= hj && (!S.crTorre || c.a.tr === S.crTorre)).sort((p, q) => p.d.localeCompare(q.d))[0];
+  const resumo = `<div class="cr-res">${[['bad', 'Atrasadas'], ['cur', 'Em execução'], ['fut', 'A executar'], ['ok', 'Concluídas']].map(([st, t]) => `<button class="st-${st}" data-crst="${st}" aria-pressed="${S.crSt === st}"><div class="n">${cnt(st)}</div><div class="t">${t}${S.crSt === st ? ' · filtrando' : ''}</div></button>`).join('')}
+    <button class="st-conc" data-crmv="${proxC ? proxC.d : ''}" ${proxC ? '' : 'disabled'}><div class="n">${proxC ? ddmm(proxC.d) : '—'}</div><div class="t">Próxima concretagem${proxC ? ': ' + esc(proxC.rot) : ''}</div></button></div>`;
+  const vis = [['semana', 'Semana'], ['mes', 'Mês'], ['geral', 'Geral'], ['tabela', S.canEdit ? 'Tabela (editar)' : 'Tabela']];
+  const filtros = `<div class="f" style="margin-top:10px"><div class="sw" role="group" aria-label="Visualização">${vis.map(([v, t]) => `<button data-crv="${v}" aria-pressed="${S.crView === v}">${t}</button>`).join('')}</div>
+    <select id="crTorre" aria-label="Torre"><option value="">Todas as torres</option>${torres.map(t => `<option value="${esc(t)}" ${S.crTorre === t ? 'selected' : ''}>${t === 'Geral' ? 'Geral (obra toda)' : 'Torre ' + esc(t.slice(1))}</option>`).join('')}</select>
+    <select id="crEt" aria-label="Etapa"><option value="">Todas as etapas</option>${ets.map(e => `<option value="${e.n}" ${S.crEt == e.n ? 'selected' : ''}>${pad(e.n)} · ${esc(e.nome)}</option>`).join('')}</select>
+    <select id="crSt" aria-label="Situação"><option value="">Todas as situações</option>${[['bad','Atrasadas'],['cur','Em execução'],['fut','A executar'],['ok','Concluídas'],['crit','Caminho crítico']].map(([v, t]) => `<option value="${v}" ${S.crSt === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+    <input id="crQ" type="search" placeholder="Buscar (ex.: pintura, contrapiso)" value="${esc(S.crQ)}" aria-label="Buscar atividade">
+    <label style="flex-direction:row;align-items:center;gap:5px;color:var(--ink);font-size:13px"><input type="checkbox" id="crConc" ${S.crConc ? 'checked' : ''}> Só concretagens</label>
+    ${S.crTorre || S.crEt || S.crSt || S.crQ || S.crConc ? '<button class="btn sm" data-act="cr-limpar">Limpar filtros</button>' : ''}</div>`;
+  let corpo;
+  if (S.crView === 'semana') corpo = `<div class="body">${crSemana(l)}</div>`;
+  else if (S.crView === 'mes') corpo = `<div class="body">${crMes(l)}</div>`;
+  else if (S.crView === 'geral') corpo = `<div class="body">${crGeral(l)}</div>`;
   else corpo = `<div class="scroll"><table><thead><tr><th>ID</th><th>Atividade</th><th>Torre</th><th class="num">Dur. (dias)</th><th>Predecessoras</th><th>Início</th><th>Fim</th><th class="num">Folga</th><th class="num">% exec.</th><th>Início real</th><th>Fim real</th><th class="num">Custo previsto</th><th class="num">Realizado</th><th>Situação</th></tr></thead><tbody>
     ${l.map(a => `<tr><td class="mono">${esc(a.id)}</td><td class="desc">${esc(a.nome)}<small>${esc(a.et)}${a.sub ? ' · ' + esc(a.sub) : ''}</small></td><td>${esc(a.tr)}</td>
       <td style="width:76px">${ed('at', [a.id], 'dur', a.dur, {num:true, w:64, label:'Duração'})}</td>
@@ -680,10 +859,10 @@ function viewCrono(){
       <td style="width:140px">${ed('at', [a.id], 'iniR', a.iniR, {date:true, label:'Início real'})}</td><td style="width:140px">${ed('at', [a.id], 'fimR', a.fimR, {date:true, label:'Fim real'})}</td>
       <td class="num">${R0(a.cost)}</td><td class="num">${R0(a.real)}</td><td><span class="pill ${stC[a.st]}">${stL[a.st]}</span></td></tr>`).join('')}
     </tbody></table></div>`;
-  return `<section class="card"><header><h2>Cronograma</h2><span class="note">Durações em dias corridos. Mudar duração, início ou fim empurra as sucessoras que começariam antes do fim da predecessora; nenhuma é puxada para antes.</span><span class="sp"></span>${filtros}</header>${corpo}
+  return `<section class="card"><header style="display:block"><div class="f"><h2>Cronograma</h2><span class="note">Hoje é ${brL(hj)}. Clique num número para filtrar.${S.crView === 'tabela' ? ' Durações em dias corridos; mudar duração, início ou fim empurra as sucessoras (nunca puxa para antes).' : ''}</span></div><div style="margin-top:10px">${resumo}</div>${filtros}</header>${corpo}
   ${S.canEdit ? `<form class="body form" data-novaat style="border-top:1px solid var(--line)"><label>ID<input name="id" required placeholder="9.9"></label><label class="wide">Atividade<input name="nome" required></label><label>Etapa<select name="et">${Object.values(M.etapas).sort((a, b) => a.n - b.n).map(e => `<option value="${e.n} ${esc(e.nome)}">${e.n} · ${esc(e.nome)}</option>`).join('')}</select></label><label>Torre<input name="tr" value="Geral"></label><label>Duração (dias)<input name="dur" inputmode="numeric" required></label><label>Predecessoras<input name="pred" placeholder="separe por ;"></label><label>Início<input name="ini" type="date" required></label><div><button class="btn pri">Incluir atividade</button></div></form>` : ''}</section>`;
 }
-function gantt(l){
+function ganttAntigo(l){
   if (!l.length) return '<div class="empty">Nenhuma atividade.</div>';
   const ini = M.iniObra, fim = M.fimObra, dias = diff(ini, fim) + 1, px = 3.2, W = Math.max(600, dias * px);
   const pos = s => diff(ini, s) * px;
@@ -1183,7 +1362,19 @@ let bt; document.addEventListener('input', ev => {
   if (ev.target.id === 'buscaIns') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.insQ = v; render(); }, 250); }
 });
 document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.hasAttribute('data-iaform')) perguntarIA(S.iaRascunho || ''); else if (ev.target.hasAttribute('data-novafoto')) enviarFotos(ev.target); else aoEnviar(ev.target); });
-document.addEventListener('input', ev => { if (ev.target.id === 'ia-txt') S.iaRascunho = ev.target.value; });
+document.addEventListener('input', ev => { if (ev.target.id === 'ia-txt') S.iaRascunho = ev.target.value;
+  if (ev.target.id === 'crQ') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.crQ = v; render(); }, 300); } });
+document.addEventListener('change', ev => { if (ev.target.id === 'crConc') { S.crConc = ev.target.checked; render(); } });
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-crmv],[data-crmes],[data-crdia],[data-crst],[data-act="cr-limpar"],[data-act="cg-abrir"],[data-act="cg-fechar"]'); if (!b) return;
+  if (b.dataset.crst) { S.crSt = S.crSt === b.dataset.crst ? '' : b.dataset.crst; render(); return; }
+  if (b.dataset.crdia) { S.crDia = S.crDia === b.dataset.crdia ? '' : b.dataset.crdia; render(); return; }
+  if (b.dataset.crmes) { const r = (S.crRef || today()).slice(0, 7); let y = +r.slice(0, 4), m = +r.slice(5) + +b.dataset.crmes; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } S.crRef = y + '-' + pad(m) + '-01'; S.crDia = ''; render(); return; }
+  if (b.dataset.crmv != null) { const v = b.dataset.crmv; if (!v) return; if (v === '0') S.crRef = ''; else if (/^\d{4}-/.test(v)) { S.crRef = v; if (S.crView === 'geral' || S.crView === 'tabela') S.crView = 'semana'; } else S.crRef = addDays(S.crRef || today(), +v); S.crDia = ''; render(); return; }
+  if (b.dataset.act === 'cr-limpar') { S.crTorre = S.crEt = S.crSt = S.crQ = ''; S.crConc = false; render(); return; }
+  if (b.dataset.act === 'cg-abrir') { for (const e of Object.values(M.etapas)) S.open['cg' + e.n] = true; render(); return; }
+  if (b.dataset.act === 'cg-fechar') { for (const k in S.open) if (k.startsWith('cg')) delete S.open[k]; render(); return; }
+});
 document.addEventListener('keydown', ev => { if (ev.target.id === 'ia-txt' && ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); perguntarIA(ev.target.value); } });
 document.addEventListener('click', ev => {
   const b = ev.target.closest('[data-iasug],[data-act="ia-limpar"]'); if (!b) return;
