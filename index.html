@@ -1,0 +1,1021 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Obra Residencial Madrid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barra fixa com os números da obra, abas de módulo, área de trabalho em tabelas densas; gaveta lateral para a composição */
+:root{
+  --bg:#EEF0EE; --panel:#FBFCFB; --panel2:#F4F6F5; --ink:#1A2226; --muted:#56636A; --line:#D5DBD9;
+  --accent:#1D5A86; --accent-ink:#FFFFFF; --accent-weak:#E1ECF5;
+  --ok:#2C6E48; --ok-weak:#E0F0E6; --warn:#9A5408; --warn-weak:#FAEEDD; --bad:#A3271F; --bad-weak:#F9E4E2;
+  --edit:#FFF7D6; --edit-line:#E8D58A; --bar:#7FA6C4; --bar-done:#2C6E48;
+  --f-ui:'IBM Plex Sans',Arial,sans-serif; --f-data:'IBM Plex Sans Condensed','Arial Narrow',Arial,sans-serif; --f-mono:'IBM Plex Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12181B; --panel:#1A2226; --panel2:#20292E; --ink:#E4EAEC; --muted:#9AA8AE; --line:#2F3B41;
+  --accent:#78AEDB; --accent-ink:#0E1B26; --accent-weak:#1C3346;
+  --ok:#7CC89B; --ok-weak:#18301F; --warn:#E5A65E; --warn-weak:#35270F; --bad:#F08C82; --bad-weak:#3A1D1A;
+  --edit:#2B2815; --edit-line:#5E5427; --bar:#3F6A8C; --bar-done:#4F9A6E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#12181B; --panel:#1A2226; --panel2:#20292E; --ink:#E4EAEC; --muted:#9AA8AE; --line:#2F3B41;
+  --accent:#78AEDB; --accent-ink:#0E1B26; --accent-weak:#1C3346;
+  --ok:#7CC89B; --ok-weak:#18301F; --warn:#E5A65E; --warn-weak:#35270F; --bad:#F08C82; --bad-weak:#3A1D1A;
+  --edit:#2B2815; --edit-line:#5E5427; --bar:#3F6A8C; --bar-done:#4F9A6E; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font:14px/1.45 var(--f-ui);padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1500px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.mono{font-family:var(--f-mono);font-size:12.5px}
+.muted{color:var(--muted)}
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:14px 0;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+.id{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.id h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.id .sub{color:var(--muted);font-size:13px}
+.id .who{margin-left:auto;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-ok{background:var(--ok-weak);color:var(--ok)} .p-warn{background:var(--warn-weak);color:var(--warn)} .p-bad{background:var(--bad-weak);color:var(--bad)} .p-acc{background:var(--accent-weak);color:var(--accent)} .p-mut{background:var(--panel2);color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:10px}
+.kpi{background:var(--panel);padding:8px 12px;min-width:0}
+.kpi .l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.kpi .v{font:600 19px/1.25 var(--f-data);font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:2px;overflow-x:auto;margin-top:10px;scrollbar-width:thin}
+.tabs button{border:0;background:none;padding:9px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+/* corpo */
+main{padding-top:18px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;min-width:0}
+.card>header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.card>header h2{font-size:15px;font-weight:700}
+.card>header .sp{flex:1}
+.card .body{padding:12px 14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:18px}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font:600 11.5px/1.3 var(--f-ui);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;background:var(--panel2);position:sticky;top:0;z-index:1;white-space:nowrap}
+td{font-family:var(--f-data);font-size:13.5px}
+tr.grp td{background:var(--panel2);font-weight:700;font-family:var(--f-ui);text-transform:uppercase;font-size:12.5px;letter-spacing:.03em}
+tr.sub td{background:var(--accent-weak);font-weight:600;font-family:var(--f-ui)}
+tr.sub td:nth-child(2){padding-left:22px}
+tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--accent-weak)}
+td.desc{min-width:340px;max-width:560px}
+.desc small{display:block;color:var(--muted);font-size:12px}
+input.e,select.e,textarea.e{background:var(--edit);border:1px solid var(--edit-line);border-radius:3px;padding:3px 6px;width:100%;min-width:60px;font-family:var(--f-data);font-size:13.5px}
+input.e.n{text-align:right;font-variant-numeric:tabular-nums}
+input.e:focus,select.e:focus,textarea.e:focus{outline:2px solid var(--accent);outline-offset:0;background:var(--panel)}
+input.e:disabled,select.e:disabled{background:transparent;border-color:transparent;color:inherit;opacity:1}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:6px 12px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.sm{padding:3px 8px;font-size:12px}
+.btn.del{color:var(--bad)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:default}
+.f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.f input,.f select{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:5px 8px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.form label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.form input,.form select{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:6px 8px;width:100%}
+.form .wide{grid-column:1/-1}
+.bar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted)}
+.alert{display:flex;gap:10px;padding:8px 12px;border-radius:5px;font-size:13px}
+.alert.warn{background:var(--warn-weak);color:var(--warn)} .alert.bad{background:var(--bad-weak);color:var(--bad)} .alert.info{background:var(--accent-weak);color:var(--accent)}
+/* gantt */
+.gantt{position:relative}
+.g-row{display:grid;grid-template-columns:270px 1fr;border-bottom:1px solid var(--line);min-height:26px;align-items:center}
+.g-lab{padding:3px 8px;font:13px/1.25 var(--f-data);position:sticky;left:0;background:var(--panel);z-index:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-right:1px solid var(--line)}
+.g-lab b{font-family:var(--f-mono);font-weight:500;font-size:12px;color:var(--muted);margin-right:6px}
+.g-tr{position:relative;height:26px}
+.g-b{position:absolute;top:7px;height:12px;border-radius:3px;background:var(--bar);overflow:hidden}
+.g-b i{position:absolute;left:0;top:0;bottom:0;background:var(--bar-done)}
+.g-b.crit{outline:2px solid var(--bad);outline-offset:0}
+.g-head{display:grid;grid-template-columns:270px 1fr;position:sticky;top:0;z-index:3;background:var(--panel2);border-bottom:1px solid var(--line)}
+.g-head .g-lab{background:var(--panel2);font:600 11.5px var(--f-ui);text-transform:uppercase;color:var(--muted)}
+.g-m{position:absolute;top:0;bottom:0;border-left:1px solid var(--line);font:600 11px var(--f-ui);color:var(--muted);padding:6px 4px;white-space:nowrap}
+.g-today{position:absolute;top:0;bottom:0;width:2px;background:var(--bad);z-index:1;opacity:.7}
+/* gaveta */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(760px,100%);background:var(--panel);border-left:1px solid var(--line);z-index:50;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.18)}
+.drawer>header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+.drawer>header h2{font-size:16px}
+.drawer .in{padding:14px 16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.shade{position:fixed;inset:0;background:rgba(10,15,18,.35);z-index:49}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;z-index:60;font-weight:500;max-width:90vw}
+.chart text{font:11px var(--f-data);fill:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:6px}
+.sw{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.sw button{border:0;background:var(--panel);padding:5px 12px;cursor:pointer;font-weight:600;color:var(--muted)}
+.sw button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+/* fotos */
+.fotos-dia{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px}
+.foto{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.foto button.ver{display:block;padding:0;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:var(--panel2);cursor:zoom-in;aspect-ratio:4/3}
+.foto button.ver img{width:100%;height:100%;object-fit:cover;display:block}
+.foto button.ver:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.foto figcaption{font-size:13px;line-height:1.35}
+.foto .falta{display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--muted)}
+.lb{position:fixed;inset:0;z-index:70;background:rgba(8,12,14,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.lb img{max-width:100%;max-height:calc(100% - 70px);object-fit:contain;border-radius:4px}
+.lb .cap{color:#E4EAEC;font-size:14px;margin-top:10px;text-align:center;max-width:900px}
+.lb .nav{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:16px;display:flex;gap:8px}
+.lb .nav .btn{background:#1A2226;color:#E4EAEC;border-color:#2F3B41}
+@media (max-width:900px){ .top{position:static} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:640px){ .kpi .v{font-size:16px} .g-row,.g-head{grid-template-columns:150px 1fr} td.desc{min-width:200px} }
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="id">
+      <h1 id="t-nome">Residencial Madrid</h1>
+      <span class="sub" id="t-sub">FIPAL Construtora · Cascavel/PR · orçamento, cronograma e físico-financeiro</span>
+      <span class="who" id="t-who"></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+  <main id="main"><div class="card"><div class="empty">Abrindo a base da obra…</div></div></main>
+</div>
+<div id="drawer-root"></div>
+<div id="toast" class="toast" hidden></div>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1D5A86">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Obra Madrid">
+<link rel="apple-touch-icon" href="icone-192.png">
+<link rel="icon" type="image/png" href="icone-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supa.js"></script>
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script><script>
+'use strict';
+// ---------- estado
+const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, hist:{},
+  got:{obra:false, comp:false, orc:false, lanc:false}, canEdit:false, uid:null,
+  tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'tabela', crTorre:'', crEt:'', crSt:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
+let db = null, user = null, M = null, assetsNS = null;
+const TABS = [['painel','Painel'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
+
+// ---------- formatação
+const nf2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nf0 = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
+const nf4 = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:6});
+const R = v => 'R$ ' + nf2.format(v || 0);
+const R0 = v => 'R$ ' + nf0.format(Math.round(v || 0));
+const K = v => nf0.format(Math.round((v || 0)));
+const P = (v, d = 1) => ((v || 0) * 100).toLocaleString('pt-BR', {minimumFractionDigits:d, maximumFractionDigits:d}) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function num(s){ if (typeof s === 'number') return s; s = String(s ?? '').trim().replace(/\s|R\$|%/g,''); if (!s) return null; if (s.includes(',')) s = s.replace(/\./g,'').replace(',','.'); const v = Number(s); return isFinite(v) ? v : null; }
+const pad = n => String(n).padStart(2,'0');
+const isoD = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+const D = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d, 12); };
+const addDays = (s, n) => { const d = D(s); d.setDate(d.getDate() + n); return isoD(d); };
+const diff = (a, b) => Math.round((D(b) - D(a)) / 864e5);
+const br = s => s ? s.slice(8,10) + '/' + s.slice(5,7) + '/' + s.slice(2,4) : '';
+const today = () => isoD(new Date());
+const MES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const mesLab = m => MES[+m.slice(5,7)-1] + '/' + m.slice(2,4);
+const lastDay = m => { const d = new Date(+m.slice(0,4), +m.slice(5,7), 0, 12); return isoD(d); };
+const nextMes = m => { let y = +m.slice(0,4), mo = +m.slice(5,7) + 1; if (mo > 12) { mo = 1; y++; } return y + '-' + pad(mo); };
+const etN = s => parseInt(String(s || '')) || 0;
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 3200); }
+
+// ---------- cálculo
+let memo;
+function preco(c){ const i = S.ins[c]; if (!i) return null; return i.p != null ? i.p : (i.sinapi != null ? i.sinapi : 0); }
+function custoComp(c, d = 0){
+  if (memo.has(c)) return memo.get(c);
+  const cp = S.comps[c]; if (!cp || d > 25) return null;
+  let s = 0;
+  for (const l of cp.it || []) {
+    let p;
+    if (l.t === 'I') { p = preco(l.c); if (p == null) p = l.p || 0; }
+    else { p = S.comps[l.c] ? custoComp(l.c, d+1) : (l.p || 0); if (p == null) p = 0; }
+    s += (l.k || 0) * p;
+  }
+  const v = Math.round((s + 1e-9) * 100) / 100; memo.set(c, v); return v;
+}
+// mão de obra × material × serviços: pela classe do insumo (ou pelo campo cat do insumo, quando definido)
+const CATS = [['MO','Mão de obra'],['MAT','Material'],['SV','Serviços']];
+const catNome = c => (CATS.find(x => x[0] === c) || [, ''])[1];
+function catIns(c){
+  const i = S.ins[c]; if (!i) return 'MAT'; if (i.cat) return i.cat;
+  const cl = String(i.cl || '').toUpperCase();
+  if (cl.includes('MAO DE OBRA') || cl.includes('MÃO DE OBRA') || cl.includes('ENCARGOS')) return 'MO';
+  if (cl.includes('VERBA')) return 'SV';
+  return 'MAT';
+}
+let memoS;
+function splitComp(c, d = 0){
+  if (memoS.has(c)) return memoS.get(c);
+  const r = { MO:0, MAT:0, SV:0 }; const cp = S.comps[c]; if (!cp || d > 25) return r;
+  for (const l of cp.it || []) {
+    const k = l.k || 0;
+    if (l.t === 'I') { const p = preco(l.c); r[catIns(l.c)] += k * (p == null ? (l.p || 0) : p); }
+    else if (S.comps[l.c]) { const s = splitComp(l.c, d + 1); r.MO += k * s.MO; r.MAT += k * s.MAT; r.SV += k * s.SV; }
+    else r.MAT += k * (l.p || 0);
+  }
+  memoS.set(c, r); return r;
+}
+function linhaPreco(l){ if (l.t === 'I') { const p = preco(l.c); return p == null ? (l.p || 0) : p; } return S.comps[l.c] ? custoComp(l.c) : (l.p || 0); }
+function linhaInfo(l){ if (l.t === 'I') { const i = S.ins[l.c]; return i ? {d:i.d, u:i.u} : {d:l.d || '(insumo não cadastrado)', u:l.u || ''}; } const c = S.comps[l.c]; return c ? {d:c.d, u:c.u} : {d:l.d || '(composição auxiliar)', u:l.u || ''}; }
+
+function calc(){
+  memo = new Map(); memoS = new Map();
+  const cfg = S.cfg || {};
+  const m = { itens:[], etapas:{}, atCost:{}, atReal:{}, atSb:{}, rs:{}, total:0, semAt:[], semComp:[], realM:0, realC:0, realMes:{}, realEt:{}, lanc:[], usoComp:{}, porTorre:{}, torreSet:new Set() };
+  // orçamento
+  for (const [eid, e] of Object.entries(S.orc)) {
+    const et = m.etapas[e.n] || (m.etapas[e.n] = { eid, n:e.n, nome:e.nome, total:0, itens:[], real:0 });
+    for (const [iid, it] of Object.entries(e.itens || {})) {
+      if (it.x) continue;
+      const cp = S.comps[it.c];
+      const un = cp ? custoComp(it.c) : 0;
+      const tot = (it.q || 0) * (un || 0);
+      const ats = String(it.at || '').split(',').map(s => s.trim()).filter(Boolean);
+      const val = ats.filter(a => S.at[a] && !S.at[a].x);
+      const sb = it.sb || (val[0] && S.at[val[0]].sub) || 'Geral';
+      const row = { eid, iid, it, desc: cp ? cp.d : '(código sem composição)', unid: cp ? cp.u : '', un, tot, n:e.n, ats, val, sb, tr: it.tr || 'Geral' };
+      const sp = cp ? splitComp(it.c) : { MO:0, MAT:0, SV:0 }; const ss = sp.MO + sp.MAT + sp.SV;
+      row.mo = ss ? tot * sp.MO / ss : 0; row.sv = ss ? tot * sp.SV / ss : 0; row.mat = tot - row.mo - row.sv;
+      const g = rsCel(m, e.n, sb); g.oMO += row.mo; g.oMAT += row.mat; g.oSV += row.sv;
+      for (const a of val) { const t = m.atSb[a] || (m.atSb[a] = {}); const k = e.n + '|' + sb; t[k] = (t[k] || 0) + tot / val.length; }
+      const pt = m.porTorre[e.n] || (m.porTorre[e.n] = {}); pt[row.tr] = (pt[row.tr] || 0) + tot; m.torreSet.add(row.tr);
+      et.itens.push(row); et.total += tot; m.total += tot; m.itens.push(row);
+      m.usoComp[it.c] = (m.usoComp[it.c] || 0) + 1;
+      if (!cp) m.semComp.push(row);
+      if (!val.length) m.semAt.push(row); else for (const a of val) m.atCost[a] = (m.atCost[a] || 0) + tot / val.length;
+    }
+    et.itens.sort((a, b) => (a.it.ord || 0) - (b.it.ord || 0));
+  }
+  // EAP no padrão do Sienge: etapa > subetapa (serviço) > item
+  for (const et of Object.values(m.etapas)) {
+    et.subs = []; const sm = {};
+    for (const r of et.itens) { let s = sm[r.sb]; if (!s) { s = sm[r.sb] = { nome: r.sb, itens: [], total: 0 }; et.subs.push(s); } s.itens.push(r); s.total += r.tot; }
+    et.subs.forEach((s, i) => { s.cod = pad(et.n) + '.' + pad(i + 1); s.itens.forEach((r, j) => { r.eap = s.cod + '.' + String(j + 1).padStart(3, '0'); }); });
+  }
+  m.torres = [...m.torreSet].sort((a, b) => a === 'Geral' ? -1 : b === 'Geral' ? 1 : a.localeCompare(b));
+  const ind = cfg.indiretas || [1, 11];
+  m.indiretos = Object.values(m.etapas).filter(e => ind.includes(e.n)).reduce((s, e) => s + e.total, 0);
+  m.diretos = m.total - m.indiretos;
+  const b = cfg.bdi || {ac:0, sg:0, r:0, df:0, l:0, i:0};
+  m.bdi = (1 + b.ac + b.sg + b.r) * (1 + b.df) * (1 + b.l) / (1 - b.i) - 1;
+  m.preco = m.total * (1 + m.bdi);
+  m.meta = cfg.meta || 0;
+  // realizado
+  for (const [mid, doc] of Object.entries(S.lanc)) for (const [lid, l] of Object.entries(doc.l || {})) {
+    if (l.x) continue;
+    const v = l.v || 0, mes = (l.data || '').slice(0,7);
+    const a = S.at[l.at]; const n = a ? etN(a.et) : 0;
+    const sb = l.sb || sbDominante(m, l.at, n) || 'Outros';
+    let mo = 0, mat = 0, sv = 0, cat = l.cat || (l.tp === 'C' ? 'MAT' : 'MO');
+    if (l.mo != null) { mo = l.mo; mat = v - l.mo; cat = 'MIX'; } else if (cat === 'MO') mo = v; else if (cat === 'SV') sv = v; else mat = v;
+    const g = rsCel(m, n, sb); g.rMO += mo; g.rMAT += mat; g.rSV += sv;
+    m.lanc.push({ mid, lid, l, n, sb, cat });
+    if (l.tp === 'M') m.realM += v; else m.realC += v;
+    m.realMes[mes] = (m.realMes[mes] || 0) + v;
+    m.realEt[n] = (m.realEt[n] || 0) + v;
+    if (l.at) m.atReal[l.at] = (m.atReal[l.at] || 0) + v;
+  }
+  m.real = m.realM + m.realC;
+  m.lanc.sort((x, y) => (y.l.data || '').localeCompare(x.l.data || ''));
+  for (const et of Object.values(m.etapas)) et.real = m.realEt[et.n] || 0;
+  // cronograma
+  const hj = today();
+  const ats = Object.entries(S.at).filter(([, a]) => !a.x && a.ini && a.fim).map(([id, a]) => ({ id, ...a }));
+  ats.sort((x, y) => (x.ord || 0) - (y.ord || 0));
+  const byId = {}; for (const a of ats) byId[a.id] = a;
+  const succ = {}; for (const a of ats) for (const p of String(a.pred || '').split(';').filter(p => byId[p])) (succ[p] || (succ[p] = [])).push(a.id);
+  let fimObra = ats.reduce((mx, a) => a.fim > mx ? a.fim : mx, '0000');
+  let iniObra = ats.reduce((mn, a) => a.ini < mn ? a.ini : mn, '9999');
+  if (cfg.dataBase && cfg.dataBase < iniObra) iniObra = cfg.dataBase;
+  // folga: passe para trás em ordem topológica reversa
+  const ord = topo(byId), LF = {};
+  for (let i = ord.length - 1; i >= 0; i--) {
+    const a = byId[ord[i]]; const ss = succ[a.id] || [];
+    let lf = fimObra; for (const s of ss) { const sa = byId[s]; const ls = addDays(LF[s], -(diff(sa.ini, sa.fim))); const c = addDays(ls, -1); if (c < lf) lf = c; }
+    LF[a.id] = lf;
+  }
+  let fis = 0, prevHj = 0;
+  for (const a of ats) {
+    a.cost = m.atCost[a.id] || 0; a.real = m.atReal[a.id] || 0;
+    a.dc = diff(a.ini, a.fim) + 1;
+    a.folga = diff(a.fim, LF[a.id]); a.crit = a.folga <= 0;
+    a.prev = hj < a.ini ? 0 : hj >= a.fim ? 1 : (diff(a.ini, hj) + 1) / a.dc;
+    const pc = a.pct || 0;
+    a.st = pc >= 1 ? 'ok' : (hj > a.fim ? 'bad' : (hj >= a.ini ? ((a.prev - pc > 0.15) ? 'bad' : 'cur') : 'fut'));
+    fis += a.cost * Math.min(1, pc); prevHj += a.cost * a.prev;
+  }
+  m.ats = ats; m.byId = byId; m.succ = succ; m.fimObra = fimObra; m.iniObra = iniObra;
+  m.fis = m.total ? fis / m.total : 0; m.prevHj = m.total ? prevHj / m.total : 0; m.fisRS = fis;
+  // físico-financeiro mensal
+  const meses = []; if (iniObra < '9999') { let mm = iniObra.slice(0,7); const fm = fimObra.slice(0,7); let g = 0; while (mm <= fm && g++ < 60) { meses.push(mm); mm = nextMes(mm); } }
+  m.meses = meses; const dd = distribuir(ats, meses); m.ffEt = dd.et; m.ffTot = dd.tot;
+  m.semCusto = ats.length ? m.total - Object.values(m.ffTot).reduce((s, v) => s + v, 0) : 0;
+  return m;
+}
+function rsCel(m, n, sb){ const e = m.rs[n] || (m.rs[n] = {}); return e[sb] || (e[sb] = { oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0 }); }
+// subetapa do orçamento com mais custo ligada à atividade (de preferência na mesma etapa)
+function sbDominante(m, at, n){
+  const t = m.atSb[at]; if (!t) return '';
+  let best = '', bv = -1, bestAny = '', bvAny = -1;
+  for (const [k, v] of Object.entries(t)) { const [en, sb] = [+k.split('|')[0], k.slice(k.indexOf('|') + 1)]; if (v > bvAny) { bvAny = v; bestAny = sb; } if (en === n && v > bv) { bv = v; best = sb; } }
+  return best || bestAny;
+}
+// custo de cada atividade distribuído pelos dias corridos do seu período
+function distribuir(ats, meses){
+  const et = {}, tot = {}; for (const mm of meses) tot[mm] = 0;
+  for (const a of ats) {
+    if (!a.cost) continue; const n = etN(a.et); const row = et[n] || (et[n] = {});
+    for (const mm of meses) {
+      const s = a.ini > mm + '-01' ? a.ini : mm + '-01'; const ld = lastDay(mm); const e = a.fim < ld ? a.fim : ld;
+      if (e >= s) { const v = a.cost * (diff(s, e) + 1) / a.dc; row[mm] = (row[mm] || 0) + v; tot[mm] += v; }
+    }
+  }
+  return { et, tot };
+}
+function topo(byId){
+  const indeg = {}, out = {}, res = [];
+  for (const id in byId) { indeg[id] = 0; out[id] = []; }
+  for (const id in byId) for (const p of String(byId[id].pred || '').split(';')) if (byId[p] && p !== id) { indeg[id]++; out[p].push(id); }
+  const q = Object.keys(indeg).filter(id => !indeg[id]).sort((a, b) => (byId[a].ord || 0) - (byId[b].ord || 0));
+  while (q.length) { const id = q.shift(); res.push(id); for (const s of out[id]) if (--indeg[s] === 0) q.push(s); }
+  for (const id in byId) if (!res.includes(id)) res.push(id); // ciclo: mantém no fim
+  return res;
+}
+// empurra as sucessoras quando uma atividade termina depois do início delas (nunca puxa para antes)
+function propagar(patch){
+  const A = {}; for (const [id, a] of Object.entries(S.at)) if (!a.x) A[id] = { ...a, ...(patch[id] || {}) };
+  const ord = topo(A); const out = { ...patch }; let mov = 0;
+  for (const id of ord) {
+    const a = A[id]; if (a.iniR) continue;
+    const ps = String(a.pred || '').split(';').filter(p => A[p]); if (!ps.length) continue;
+    let min = null; for (const p of ps) { const f = addDays(A[p].fimR || A[p].fim, 1); if (!min || f > min) min = f; }
+    if (a.ini < min) { a.ini = min; a.fim = addDays(min, Math.max(1, a.dur || 1) - 1); out[id] = { ...(out[id] || {}), ini:a.ini, fim:a.fim }; mov++; }
+  }
+  return { out, mov };
+}
+
+// ---------- gravação
+async function upsert(path, data, base){
+  const ref = db.doc(path);
+  try { await ref.update(data); }
+  catch (e) { if (e && e.code === 'invalid_argument') { const s = await ref.get(); if (!s.exists) { await ref.set(base ? merge(base, data) : data); return; } } throw e; }
+}
+function merge(a, b){ const o = { ...a }; for (const k in b) o[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') ? merge(a[k], b[k]) : b[k]; return o; }
+async function salvar(path, data, msg, base){
+  if (!db) return false;
+  if (!S.canEdit) { toast('Seu acesso é só de leitura. Peça acesso de edição à engenharia.'); return false; }
+  try { await upsert(path, data, base); if (msg) registrar(msg); return true; }
+  catch (e) { toast(e && e.code === 'quota_exceeded' ? 'A base da obra está cheia. Avise a engenharia.' : 'Não salvou: ' + (e && e.message || 'erro de conexão') + '. Tente de novo.'); return false; }
+}
+function registrar(msg){
+  const mes = today().slice(0,7).replace('-','');
+  upsert('hist/h' + mes, { l: { [uid('h')]: { t: new Date().toISOString(), u: S.uid || '', a: msg } } }, { mes }).catch(() => {});
+}
+
+// ---------- topo e abas
+function renderTop(){
+  const k = document.getElementById('kpis');
+  if (!M) { k.innerHTML = ''; return; }
+  const falta = M.total - M.meta;
+  const fimR = M.fimObra && M.fimObra !== '0000' ? br(M.fimObra) : '–';
+  k.innerHTML = [
+    ['Custo da obra sem BDI', R0(M.total), `diretos ${R0(M.diretos)} · indiretos ${R0(M.indiretos)}`],
+    ['Meta sem BDI', R0(M.meta), falta > 0 ? `<span class="pill p-bad">falta ${R0(falta)}</span>` : `<span class="pill p-ok">folga ${R0(-falta)}</span>`],
+    ['Preço com BDI', R0(M.preco), `BDI ${P(M.bdi, 2)}`],
+    ['Realizado', R0(M.real), `${P(M.total ? M.real / M.total : 0)} do custo`],
+    ['Avanço físico', P(M.fis), `previsto hoje ${P(M.prevHj)}`],
+    ['Fim do cronograma', fimR, `${M.ats.filter(a => a.st === 'bad').length} atividades atrasadas`]
+  ].map(([l, v, s]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+  const w = document.getElementById('t-who');
+  w.innerHTML = db ? (S.canEdit ? '<span class="pill p-ok">Edição liberada</span>' : '<span class="pill p-mut">Somente leitura</span>') : '';
+}
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = TABS.map(([id, l]) => `<button role="tab" id="tab-${id}" aria-selected="${S.tab === id}" data-tab="${id}">${l}</button>`).join('');
+}
+
+// ---------- telas
+function ed(kind, keys, f, val, opt = {}){
+  const id = [kind, ...keys, f].join('__').replace(/[^A-Za-z0-9_-]/g, '_');
+  const dis = S.canEdit ? '' : ' disabled';
+  const n = opt.num ? ' n' : '';
+  const v = val == null ? '' : (opt.num ? (opt.pct ? nf4.format(Math.round(val * 1000) / 10) : nf4.format(val)) : val);
+  const type = opt.date ? 'date' : 'text';
+  const w = opt.w ? ` style="width:${opt.w}px"` : '';
+  const ph = opt.ph ? ` placeholder="${esc(opt.ph)}"` : '';
+  const ls = opt.list ? ` list="${opt.list}"` : '';
+  return `<input class="e${n}" id="${id}" type="${type}" value="${esc(v)}" data-kind="${kind}" data-keys="${esc(keys.join('|'))}" data-f="${f}"${opt.pct ? ' data-pct="1"' : ''}${opt.num ? ' data-num="1"' : ''}${w}${ph}${ls}${dis} aria-label="${esc(opt.label || f)}">`;
+}
+function sel(kind, keys, f, val, opts, label){
+  const id = [kind, ...keys, f].join('__').replace(/[^A-Za-z0-9_-]/g, '_');
+  return `<select class="e" id="${id}" data-kind="${kind}" data-keys="${esc(keys.join('|'))}" data-f="${f}"${S.canEdit ? '' : ' disabled'} aria-label="${esc(label)}">${opts.map(o => `<option ${o === val ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+}
+
+function viewPainel(){
+  const hj = today(), ate = addDays(hj, 21);
+  const atras = M.ats.filter(a => a.st === 'bad').sort((a, b) => a.fim.localeCompare(b.fim));
+  const prox = M.ats.filter(a => (a.pct || 0) < 1 && a.ini >= hj && a.ini <= ate).sort((a, b) => a.ini.localeCompare(b.ini));
+  const alerts = [];
+  if (M.semComp.length) alerts.push(`<div class="alert bad">${M.semComp.length} itens do orçamento têm código sem composição e estão com custo zero.</div>`);
+  if (M.semAt.length) alerts.push(`<div class="alert warn">${M.semAt.length} itens do orçamento (${R0(M.semAt.reduce((s, r) => s + r.tot, 0))}) não estão ligados a uma atividade do cronograma e ficam fora do físico-financeiro.</div>`);
+  const semAtL = M.lanc.filter(x => !x.n).length; if (semAtL) alerts.push(`<div class="alert warn">${semAtL} lançamentos do realizado estão sem atividade válida.</div>`);
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  return `
+  ${alerts.join('')}
+  <div class="grid2">
+    <section class="card"><header><h2>Curva S</h2><span class="sp"></span><div class="legend"><span><i style="background:var(--accent)"></i>Previsto acumulado</span><span><i style="background:var(--warn)"></i>Realizado financeiro</span><span><i style="background:var(--ok);height:8px;width:8px;border-radius:50%"></i>Executado físico hoje</span></div></header><div class="body">${curvaS()}</div></section>
+    <section class="card"><header><h2>Sintético por etapa</h2><span class="sp"></span><button class="btn sm" data-go="orcamento">Abrir orçamento</button></header>
+      <div class="scroll"><table><thead><tr><th>Etapa</th><th class="num">Custo</th><th class="num">%</th><th class="num">Realizado</th><th>Consumo</th></tr></thead><tbody>
+      ${ets.map(e => `<tr class="click" data-et="${e.n}"><td>${e.n} · ${esc(e.nome)}</td><td class="num">${R0(e.total)}</td><td class="num">${P(M.total ? e.total / M.total : 0)}</td><td class="num">${R0(e.real)}</td><td><div class="bar" title="${P(e.total ? e.real / e.total : 0)}"><i style="width:${Math.min(100, e.total ? e.real / e.total * 100 : 0)}%;${e.real > e.total ? 'background:var(--bad)' : ''}"></i></div></td></tr>`).join('')}
+      <tr class="tot"><td>Custo da obra sem BDI</td><td class="num">${R0(M.total)}</td><td class="num">100%</td><td class="num">${R0(M.real)}</td><td></td></tr></tbody></table></div></section>
+  </div>
+  <div class="grid2">
+    <section class="card"><header><h2>Atrasadas</h2><span class="pill p-bad">${atras.length}</span></header>${listaAt(atras.slice(0, 14), true)}</section>
+    <section class="card"><header><h2>Começam nas próximas 3 semanas</h2><span class="pill p-acc">${prox.length}</span></header>${listaAt(prox.slice(0, 14), false)}</section>
+  </div>`;
+}
+function listaAt(l, atr){
+  if (!l.length) return `<div class="empty">${atr ? 'Nenhuma atividade atrasada.' : 'Nada começa nas próximas 3 semanas.'}</div>`;
+  return `<div class="scroll"><table><thead><tr><th>ID</th><th>Atividade</th><th>Torre</th><th>${atr ? 'Fim previsto' : 'Início'}</th><th class="num">Executado</th></tr></thead><tbody>${l.map(a => `<tr><td class="mono">${esc(a.id)}</td><td>${esc(a.nome)}</td><td>${esc(a.tr)}</td><td>${br(atr ? a.fim : a.ini)}</td><td class="num">${P(a.pct || 0, 0)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function curvaS(){
+  if (!M.meses.length) return '<div class="empty">Sem cronograma.</div>';
+  const W = 760, H = 270, L = 64, Rr = 12, T = 12, B = 30, n = M.meses.length;
+  let acc = 0; const prev = M.meses.map(mm => (acc += M.ffTot[mm]));
+  let ar = 0; const hj = today().slice(0,7); const real = []; for (const mm of M.meses) { ar += M.realMes[mm] || 0; if (mm <= hj) real.push(ar); }
+  const antes = Object.entries(M.realMes).filter(([mm]) => mm < M.meses[0]).reduce((s, [, v]) => s + v, 0); for (let i = 0; i < real.length; i++) real[i] += antes;
+  const max = Math.max(M.total, prev[n-1] || 0, real[real.length-1] || 0) * 1.05 || 1;
+  const x = i => L + (W - L - Rr) * (n === 1 ? 0.5 : i / (n - 1)), y = v => T + (H - T - B) * (1 - v / max);
+  const ticks = 5; let g = '';
+  for (let i = 0; i <= ticks; i++) { const v = max * i / ticks; g += `<line x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})} mi</text>`; }
+  M.meses.forEach((mm, i) => { if (n <= 14 || i % 2 === 0) g += `<text x="${x(i)}" y="${H-10}" text-anchor="middle">${mesLab(mm)}</text>`; });
+  const pl = prev.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  const area = `${x(0)},${y(0)} ${pl} ${x(n-1)},${y(0)}`;
+  const rl = real.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  const hi = M.meses.indexOf(hj); const fx = hi >= 0 ? x(hi) : null;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Curva S: previsto acumulado ${R0(prev[n-1])}, realizado ${R0(real[real.length-1]||0)}">
+    ${g}<polygon points="${area}" fill="var(--accent-weak)" stroke="none"/>
+    <polyline points="${pl}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+    ${real.length ? `<polyline points="${rl}" fill="none" stroke="var(--warn)" stroke-width="2.5"/><circle cx="${x(real.length-1)}" cy="${y(real[real.length-1])}" r="4" fill="var(--warn)"/>` : ''}
+    ${fx != null ? `<line x1="${fx}" x2="${fx}" y1="${T}" y2="${H-B}" stroke="var(--bad)" stroke-dasharray="3 3"/><circle cx="${fx}" cy="${y(M.fisRS)}" r="5" fill="var(--ok)"/>` : ''}
+  </svg>`;
+}
+
+function viewOrc(){
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  const q = S.q.trim().toLowerCase();
+  const passa = r => (!S.oTorre || r.tr === S.oTorre) && (!S.oEt || String(r.n) === S.oEt) && (!S.oSub || r.sb === S.oSub) && (!q || (r.eap + ' ' + r.it.c + ' ' + r.desc + ' ' + (r.it.o || '') + ' ' + (r.it.f || '')).toLowerCase().includes(q));
+  const ativo = !!(S.oTorre || S.oEt || S.oSub || q);
+  const subsLista = [...new Set((S.oEt ? ets.filter(e => String(e.n) === S.oEt) : ets).flatMap(e => e.subs.map(s => s.nome)))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  let tot = 0, nIt = 0, linhas = '';
+  for (const e of ets) {
+    const subs = e.subs.map(s => ({ s, its: s.itens.filter(passa) })).filter(x => x.its.length); if (!subs.length) continue;
+    const te = subs.reduce((s, x) => s + x.its.reduce((a, r) => a + r.tot, 0), 0); tot += te;
+    const abE = ativo || S.exp || S.open['e' + e.n];
+    linhas += `<tr class="grp click" data-tog="e${e.n}" aria-expanded="${!!abE}"><td class="mono">${pad(e.n)}</td><td colspan="7">${abE ? '▾' : '▸'} ${esc(e.nome)}</td><td class="num">${R(te)}</td><td class="num">${P(M.total ? te / M.total : 0, 2)}</td><td class="num" colspan="3">${R0(M.realEt[e.n] || 0)} realizado</td></tr>`;
+    if (!abE) continue;
+    for (const x of subs) {
+      const ts = x.its.reduce((a, r) => a + r.tot, 0); const k = 's' + e.n + '|' + x.s.nome;
+      const abS = ativo || S.exp || S.open[k];
+      linhas += `<tr class="sub click" data-tog="${esc(k)}" aria-expanded="${!!abS}"><td class="mono">${x.s.cod}</td><td colspan="7">${abS ? '▾' : '▸'} ${esc(x.s.nome)} <small class="muted">${x.its.length} ${x.its.length === 1 ? 'item' : 'itens'}</small></td><td class="num">${R(ts)}</td><td class="num">${P(M.total ? ts / M.total : 0, 2)}</td><td colspan="3"></td></tr>`;
+      if (abS) { linhas += x.its.map(linhaItem).join(''); nIt += x.its.length; }
+    }
+  }
+  const torres = M.torres;
+  const filtros = `<div class="f">
+    <select id="oTorre" aria-label="Torre"><option value="">Todas as torres</option>${torres.map(t => `<option ${S.oTorre === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+    <select id="oEt" aria-label="Etapa"><option value="">Todas as etapas</option>${ets.map(e => `<option value="${e.n}" ${S.oEt === String(e.n) ? 'selected' : ''}>${pad(e.n)} ${esc(e.nome)}</option>`).join('')}</select>
+    <select id="oSub" aria-label="Subetapa"><option value="">Todas as subetapas</option>${subsLista.map(s => `<option ${S.oSub === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+    <input id="busca" type="search" placeholder="Buscar código ou descrição" value="${esc(S.q)}" aria-label="Buscar no orçamento">
+    ${ativo ? '<button class="btn" data-act="limpar">Limpar filtros</button>' : `<button class="btn" data-act="${S.exp ? 'recolher' : 'expandir'}">${S.exp ? 'Recolher tudo' : 'Expandir tudo'}</button>`}
+    <button class="btn" data-act="xlsx">Exportar para Excel</button></div>`;
+  const resumo = ativo ? `<div class="alert info">Filtro: ${[S.oTorre && 'torre ' + S.oTorre, S.oEt && 'etapa ' + S.oEt, S.oSub && S.oSub, q && '“' + S.q + '”'].filter(Boolean).map(esc).join(' · ')} — <b>${R(tot)}</b> (${P(M.total ? tot / M.total : 0, 2)} da obra)</div>` : '';
+  return `<section class="card"><header><h2>Orçamento analítico</h2><span class="note">Etapa › subetapa › serviço, como no Sienge. ${esc(S.cfg.refPreco || '')}. Amarelo é editável. Clique na descrição para ver e mudar a composição.</span><span class="sp"></span>${filtros}</header>
+    ${resumo ? `<div class="body" style="padding-bottom:0">${resumo}</div>` : ''}
+    ${linhas ? `<div class="scroll"><table><thead><tr><th>EAP</th><th>Código</th><th>Descrição</th><th>Un</th><th>Torre</th><th>Subetapa</th><th class="num">Quantidade</th><th class="num">Unitário</th><th class="num">Total</th><th class="num">% obra</th><th>Atividades</th><th>Observação</th><th></th></tr></thead><tbody>
+    ${linhas}
+    <tr class="tot"><td></td><td colspan="7">${ativo ? 'Total do filtro' : 'Custo da obra sem BDI'}</td><td class="num">${R(tot)}</td><td class="num">${P(M.total ? tot / M.total : 0, 2)}</td><td colspan="3"></td></tr>
+    ${ativo ? '' : `<tr><td></td><td colspan="7">Custos diretos</td><td class="num">${R(M.diretos)}</td><td class="num">${P(M.total ? M.diretos / M.total : 0, 2)}</td><td colspan="3"></td></tr><tr><td></td><td colspan="7">Custos indiretos (etapas ${(S.cfg.indiretas || []).join(' e ')})</td><td class="num">${R(M.indiretos)}</td><td class="num">${P(M.total ? M.indiretos / M.total : 0, 2)}</td><td colspan="3"></td></tr>`}
+    </tbody></table></div>` : '<div class="empty">Nenhum item neste filtro.</div>'}
+    ${formNovoItem()}</section>
+    ${viewTorres()}
+    ${viewBdi()}`;
+}
+function linhaItem(r){
+  const k = [r.eid, r.iid]; const atBad = r.ats.length && r.val.length < r.ats.length;
+  const tor = [...new Set(['Geral', 'T1', 'T2', 'T3', ...M.torres, r.tr])];
+  return `<tr><td class="mono" title="Item ${esc(r.it.item || '')} da planilha">${r.eap}</td>
+    <td style="width:120px">${ed('it', k, 'c', r.it.c, {w:110, label:'Código'})}</td>
+    <td class="desc"><a href="#" data-comp="${esc(r.it.c)}" data-eid="${r.eid}" data-iid="${r.iid}">${esc(r.desc)}</a>${r.it.f ? `<small>${esc(r.it.f)}</small>` : ''}</td>
+    <td>${esc(r.unid)}</td>
+    <td style="width:84px">${sel('it', k, 'tr', r.tr, tor, 'Torre')}</td>
+    <td style="width:170px">${ed('it', k, 'sb', r.sb, {w:160, label:'Subetapa', list:'dl-subs'})}</td>
+    <td style="width:110px">${ed('it', k, 'q', r.it.q, {num:true, w:104, label:'Quantidade'})}</td>
+    <td class="num">${R(r.un)}</td><td class="num"><b>${R(r.tot)}</b></td><td class="num">${P(M.total ? r.tot / M.total : 0, 2)}</td>
+    <td style="width:150px">${ed('it', k, 'at', r.it.at, {w:140, label:'Atividades', ph:'ex.: 7.1.1,7.2.1'})}${!r.val.length ? '<small class="pill p-warn">sem atividade</small>' : atBad ? '<small class="pill p-warn">ID inválido</small>' : ''}</td>
+    <td style="min-width:160px">${ed('it', k, 'o', r.it.o, {label:'Observação'})}</td>
+    <td>${S.canEdit ? `<button class="btn sm del" data-delitem="${r.eid}|${r.iid}" aria-label="Excluir item ${esc(r.eap)}">Excluir</button>` : ''}</td></tr>`;
+}
+function viewTorres(){
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n), ts = M.torres;
+  const tt = {}; for (const t of ts) tt[t] = 0;
+  const lin = ets.map(e => { const p = M.porTorre[e.n] || {}; for (const t of ts) tt[t] += p[t] || 0;
+    return `<tr><td>${pad(e.n)} ${esc(e.nome)}</td>${ts.map(t => `<td class="num">${p[t] ? `<a href="#" data-ft="${e.n}|${esc(t)}">${R0(p[t])}</a>` : ''}</td>`).join('')}<td class="num"><b>${R0(e.total)}</b></td></tr>`; }).join('');
+  return `<section class="card"><header><h2>Orçamento por torre</h2><span class="note">"Geral" são os serviços comuns às três torres e as áreas externas. Clique num valor para filtrar o orçamento.</span></header>
+   <div class="scroll"><table><thead><tr><th>Etapa</th>${ts.map(t => `<th class="num">${esc(t)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>${lin}
+   <tr class="tot"><td>Total</td>${ts.map(t => `<td class="num"><a href="#" data-ft="|${esc(t)}">${R0(tt[t])}</a></td>`).join('')}<td class="num">${R0(M.total)}</td></tr>
+   <tr><td>% da obra</td>${ts.map(t => `<td class="num">${P(M.total ? tt[t] / M.total : 0)}</td>`).join('')}<td class="num">100%</td></tr></tbody></table></div></section>`;
+}
+function formNovoItem(){
+  if (!S.canEdit) return '';
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  const etSel = S.oEt || String((ets[0] || {}).n || '');
+  return `<form class="body form" data-novoitem="1" style="border-top:1px solid var(--line)">
+    <label class="wide" style="font-weight:600;color:var(--ink)">Incluir serviço no orçamento</label>
+    <label>Etapa<select name="eid">${ets.map(e => `<option value="${e.eid}" ${String(e.n) === etSel ? 'selected' : ''}>${pad(e.n)} ${esc(e.nome)}</option>`).join('')}</select></label>
+    <label>Subetapa<input name="sb" list="dl-subs" value="${esc(S.oSub || '')}" placeholder="ex.: Pintura interna"></label>
+    <label>Torre<select name="tr">${['Geral', 'T1', 'T2', 'T3'].map(t => `<option ${S.oTorre === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label>Tipo<select name="tipo"><option value="comp">Composição existente</option><option value="verba">Verba ou cotação (valor fechado)</option></select></label>
+    <label>Código da composição<input name="c" list="dl-comps" placeholder="ex.: 87265 ou CP-REV-PORC"></label>
+    <label>Quantidade<input name="q" inputmode="decimal" required></label>
+    <label>Atividades<input name="at" placeholder="ex.: 8.1.1"></label>
+    <label>Descrição (verba)<input name="d" placeholder="só para verba"></label>
+    <label>Unid (verba)<input name="u" placeholder="VB, M2, UN"></label>
+    <label>Preço unitário (verba)<input name="p" inputmode="decimal"></label>
+    <label class="wide">Observação / fonte<input name="o"></label>
+    <div><button class="btn pri" type="submit">Incluir</button></div></form>`;
+}
+function viewBdi(){
+  const b = S.cfg.bdi || {};
+  const f = (k, l) => `<label>${l}${ed('cfg', ['bdi'], k, b[k], {num:true, pct:true, label:l})}</label>`;
+  return `<section class="card"><header><h2>BDI e meta</h2><span class="note">Percentuais em %. BDI = (1+AC+S+G+R)(1+DF)(1+L)/(1−I) − 1 (TCU 2622/2013)</span></header>
+   <div class="body form">${f('ac','Administração central')}${f('sg','Seguros e garantias')}${f('r','Riscos')}${f('df','Despesas financeiras')}${f('l','Lucro')}${f('i','Tributos sobre o preço')}
+   <label>Meta de custo sem BDI (R$)${ed('cfg', [], 'meta', S.cfg.meta, {num:true, label:'Meta'})}</label>
+   <div><div class="kpi" style="padding:0"><div class="l">BDI</div><div class="v">${P(M.bdi, 2)}</div><div class="s">Preço com BDI ${R0(M.preco)}</div></div></div></div></section>`;
+}
+
+function viewIns(){
+  // demanda de insumos: explode as composições
+  const dem = {};
+  const exp = (c, q, d) => { const cp = S.comps[c]; if (!cp || d > 25) return; for (const l of cp.it || []) { const qq = q * (l.k || 0); if (l.t === 'I') dem[l.c] = (dem[l.c] || 0) + qq; else if (S.comps[l.c]) exp(l.c, qq, d+1); } };
+  for (const r of M.itens) exp(r.it.c, r.it.q || 0, 0);
+  const q = S.insQ.trim().toLowerCase();
+  let rows = Object.entries(S.ins).map(([c, i]) => ({ c, i, qt: dem[c] || 0, custo: (dem[c] || 0) * (preco(c) || 0) }));
+  const tot = rows.reduce((s, r) => s + r.custo, 0);
+  rows.sort((a, b) => b.custo - a.custo); let ac = 0; for (const r of rows) { ac += r.custo; r.ac = tot ? ac / tot : 0; r.cls = r.ac <= 0.8 ? 'A' : r.ac <= 0.95 ? 'B' : 'C'; }
+  if (q) rows = rows.filter(r => (r.c + ' ' + r.i.d + ' ' + (r.i.b || '')).toLowerCase().includes(q));
+  const lim = rows.slice(0, 250);
+  return `<section class="card"><header><h2>Insumos e curva ABC</h2><span class="note">Trocar o preço adotado de um insumo recalcula todas as composições, o orçamento e o físico-financeiro. Custo na obra = consumo de material e mão de obra pelas composições.</span><span class="sp"></span>
+   <input id="buscaIns" type="search" placeholder="Buscar insumo" value="${esc(S.insQ)}" aria-label="Buscar insumo"></header>
+   <div class="scroll"><table><thead><tr><th>ABC</th><th>Código</th><th>Descrição</th><th>Un</th><th class="num">SINAPI</th><th class="num">Preço adotado</th><th>Base do preço</th><th class="num">Qtd na obra</th><th class="num">Custo na obra</th><th class="num">% acum.</th></tr></thead><tbody>
+   ${lim.map(r => `<tr><td><span class="pill ${r.cls === 'A' ? 'p-bad' : r.cls === 'B' ? 'p-warn' : 'p-mut'}">${r.cls}</span></td><td class="mono">${esc(r.c)}</td><td class="desc">${esc(r.i.d)}${r.i.o ? `<small>${esc(r.i.o)}</small>` : ''}</td><td>${esc(r.i.u)}</td>
+     <td class="num">${r.i.sinapi != null ? R(r.i.sinapi) : '–'}</td><td style="width:130px">${ed('ins', [r.c], 'p', r.i.p, {num:true, w:120, label:'Preço adotado'})}</td>
+     <td style="min-width:180px">${ed('ins', [r.c], 'b', r.i.b, {label:'Base do preço'})}</td><td class="num">${nf2.format(r.qt)}</td><td class="num">${R0(r.custo)}</td><td class="num">${P(r.ac)}</td></tr>`).join('')}
+   </tbody></table></div>${rows.length > 250 ? `<div class="note body">Mostrando 250 de ${rows.length}. Use a busca.</div>` : ''}
+   ${S.canEdit ? `<form class="body form" data-novoins style="border-top:1px solid var(--line)"><label>Código<input name="c" required placeholder="P-070"></label><label class="wide">Descrição<input name="d" required></label><label>Unid<input name="u" required></label><label>Preço (R$)<input name="p" inputmode="decimal" required></label><label>Base do preço<input name="b" placeholder="Cotação, fornecedor, data"></label><div><button class="btn pri">Cadastrar insumo</button></div></form>` : ''}</section>`;
+}
+
+function viewCrono(){
+  let l = M.ats;
+  if (S.crTorre) l = l.filter(a => a.tr === S.crTorre);
+  if (S.crEt) l = l.filter(a => String(etN(a.et)) === S.crEt);
+  if (S.crSt) l = l.filter(a => S.crSt === 'crit' ? a.crit : a.st === S.crSt);
+  const torres = [...new Set(M.ats.map(a => a.tr))].sort();
+  const ets = [...new Set(M.ats.map(a => etN(a.et)))].sort((a, b) => a - b);
+  const stL = { ok:'Concluída', bad:'Atrasada', cur:'Em curso', fut:'A iniciar' }, stC = { ok:'p-ok', bad:'p-bad', cur:'p-acc', fut:'p-mut' };
+  const filtros = `<div class="f"><div class="sw" role="group" aria-label="Visualização"><button data-crv="tabela" aria-pressed="${S.crView === 'tabela'}">Tabela</button><button data-crv="gantt" aria-pressed="${S.crView === 'gantt'}">Gantt</button></div>
+    <select id="crTorre" aria-label="Torre"><option value="">Todas as torres</option>${torres.map(t => `<option ${S.crTorre === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+    <select id="crEt" aria-label="Etapa"><option value="">Todas as etapas</option>${ets.map(n => `<option value="${n}" ${S.crEt == n ? 'selected' : ''}>Etapa ${n}</option>`).join('')}</select>
+    <select id="crSt" aria-label="Situação"><option value="">Todas as situações</option>${[['bad','Atrasadas'],['cur','Em curso'],['fut','A iniciar'],['ok','Concluídas'],['crit','Caminho crítico']].map(([v, t]) => `<option value="${v}" ${S.crSt === v ? 'selected' : ''}>${t}</option>`).join('')}</select></div>`;
+  let corpo;
+  if (S.crView === 'gantt') corpo = gantt(l);
+  else corpo = `<div class="scroll"><table><thead><tr><th>ID</th><th>Atividade</th><th>Torre</th><th class="num">Dur. (dias)</th><th>Predecessoras</th><th>Início</th><th>Fim</th><th class="num">Folga</th><th class="num">% exec.</th><th>Início real</th><th>Fim real</th><th class="num">Custo previsto</th><th class="num">Realizado</th><th>Situação</th></tr></thead><tbody>
+    ${l.map(a => `<tr><td class="mono">${esc(a.id)}</td><td class="desc">${esc(a.nome)}<small>${esc(a.et)}${a.sub ? ' · ' + esc(a.sub) : ''}</small></td><td>${esc(a.tr)}</td>
+      <td style="width:76px">${ed('at', [a.id], 'dur', a.dur, {num:true, w:64, label:'Duração'})}</td>
+      <td style="width:130px">${ed('at', [a.id], 'pred', a.pred, {w:120, label:'Predecessoras', ph:'5.1.6;2.3'})}</td>
+      <td style="width:140px">${ed('at', [a.id], 'ini', a.ini, {date:true, label:'Início'})}</td><td style="width:140px">${ed('at', [a.id], 'fim', a.fim, {date:true, label:'Fim'})}</td>
+      <td class="num">${a.crit ? '<span class="pill p-bad">crítica</span>' : a.folga + ' d'}</td>
+      <td style="width:80px">${ed('at', [a.id], 'pct', a.pct || 0, {num:true, pct:true, w:68, label:'% executado'})}</td>
+      <td style="width:140px">${ed('at', [a.id], 'iniR', a.iniR, {date:true, label:'Início real'})}</td><td style="width:140px">${ed('at', [a.id], 'fimR', a.fimR, {date:true, label:'Fim real'})}</td>
+      <td class="num">${R0(a.cost)}</td><td class="num">${R0(a.real)}</td><td><span class="pill ${stC[a.st]}">${stL[a.st]}</span></td></tr>`).join('')}
+    </tbody></table></div>`;
+  return `<section class="card"><header><h2>Cronograma</h2><span class="note">Durações em dias corridos. Mudar duração, início ou fim empurra as sucessoras que começariam antes do fim da predecessora; nenhuma é puxada para antes.</span><span class="sp"></span>${filtros}</header>${corpo}
+  ${S.canEdit ? `<form class="body form" data-novaat style="border-top:1px solid var(--line)"><label>ID<input name="id" required placeholder="9.9"></label><label class="wide">Atividade<input name="nome" required></label><label>Etapa<select name="et">${Object.values(M.etapas).sort((a, b) => a.n - b.n).map(e => `<option value="${e.n} ${esc(e.nome)}">${e.n} · ${esc(e.nome)}</option>`).join('')}</select></label><label>Torre<input name="tr" value="Geral"></label><label>Duração (dias)<input name="dur" inputmode="numeric" required></label><label>Predecessoras<input name="pred" placeholder="separe por ;"></label><label>Início<input name="ini" type="date" required></label><div><button class="btn pri">Incluir atividade</button></div></form>` : ''}</section>`;
+}
+function gantt(l){
+  if (!l.length) return '<div class="empty">Nenhuma atividade.</div>';
+  const ini = M.iniObra, fim = M.fimObra, dias = diff(ini, fim) + 1, px = 3.2, W = Math.max(600, dias * px);
+  const pos = s => diff(ini, s) * px;
+  let head = ''; let mm = ini.slice(0,7); while (mm <= fim.slice(0,7)) { const s = mm + '-01' < ini ? ini : mm + '-01'; head += `<div class="g-m" style="left:${pos(s)}px">${mesLab(mm)}</div>`; mm = nextMes(mm); }
+  const hj = today(); const tl = hj >= ini && hj <= fim ? `<div class="g-today" style="left:${pos(hj)}px" title="Hoje"></div>` : '';
+  return `<div class="scroll"><div class="gantt" style="min-width:${W + 280}px">
+   <div class="g-head"><div class="g-lab">Atividade</div><div class="g-tr" style="width:${W}px">${head}</div></div>
+   ${l.map(a => `<div class="g-row"><div class="g-lab" title="${esc(a.nome)}"><b>${esc(a.id)}</b>${esc(a.tr)} · ${esc(a.nome)}</div><div class="g-tr" style="width:${W}px">${tl}<div class="g-b${a.crit ? ' crit' : ''}" style="left:${pos(a.ini)}px;width:${Math.max(3, a.dc * px)}px" title="${esc(a.id)} ${br(a.ini)} a ${br(a.fim)} · ${P(a.pct || 0, 0)} executado${a.crit ? ' · caminho crítico' : ''}"><i style="width:${Math.min(100, (a.pct || 0) * 100)}%"></i></div></div></div>`).join('')}
+  </div></div><div class="body legend"><span><i style="background:var(--bar);height:10px"></i>Previsto</span><span><i style="background:var(--bar-done);height:10px"></i>Executado</span><span><i style="background:var(--bad)"></i>Contorno vermelho: caminho crítico · linha vermelha: hoje</span></div>`;
+}
+
+function viewFF(){
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  const ms = M.meses, pc = S.ffMode === 'pc', T = S.ffTorre;
+  const dd = T ? distribuir(M.ats.filter(a => a.tr === T), ms) : { et: M.ffEt, tot: M.ffTot };
+  const realMes = {}; let real = 0;
+  for (const x of M.lanc) { const a = M.byId[x.l.at]; if (T && (!a || a.tr !== T)) continue; const mm = (x.l.data || '').slice(0, 7); realMes[mm] = (realMes[mm] || 0) + (x.l.v || 0); real += x.l.v || 0; }
+  const base = Object.values(dd.tot).reduce((s, v) => s + v, 0) || 1;
+  const cel = v => v ? (pc ? P(v / base) : K(v)) : '';
+  let acc = 0, accR = 0; const hj = today().slice(0,7);
+  const antes = Object.entries(realMes).filter(([mm]) => mm < (ms[0] || '')).reduce((s, [, v]) => s + v, 0);
+  const torres = [...new Set(M.ats.map(a => a.tr))].sort((a, b) => a === 'Geral' ? -1 : b === 'Geral' ? 1 : a.localeCompare(b));
+  return `<section class="card"><header><h2>Cronograma físico-financeiro${T ? ' · ' + esc(T) : ''}</h2><span class="note">Custo de cada atividade distribuído pelos dias do seu período. Valores em R$ inteiros. ${T ? 'Na torre entram as atividades dela; serviços "Geral" ligados às atividades das três torres são divididos entre elas.' : ''}</span><span class="sp"></span>
+   <select id="ffTorre" aria-label="Torre"><option value="">Obra inteira</option>${torres.map(t => `<option ${T === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+   <div class="sw" role="group" aria-label="Unidade"><button data-ff="rs" aria-pressed="${!pc}">R$</button><button data-ff="pc" aria-pressed="${pc}">%</button></div><button class="btn" data-act="xlsx">Exportar para Excel</button></header>
+   <div class="scroll"><table><thead><tr><th>Etapa</th><th class="num">Total</th>${ms.map(mm => `<th class="num"${mm === hj ? ' style="color:var(--bad)"' : ''}>${mesLab(mm)}</th>`).join('')}</tr></thead><tbody>
+   ${ets.map(e => { const row = dd.et[e.n] || {}; const t = Object.values(row).reduce((s, v) => s + v, 0); if (!t) return ''; return `<tr><td>${pad(e.n)} ${esc(e.nome)}</td><td class="num"><b>${cel(t)}</b></td>${ms.map(mm => `<td class="num">${cel(row[mm])}</td>`).join('')}</tr>`; }).join('')}
+   <tr class="tot"><td>Previsto no mês</td><td class="num">${cel(base)}</td>${ms.map(mm => `<td class="num">${cel(dd.tot[mm])}</td>`).join('')}</tr>
+   <tr><td>Previsto acumulado</td><td></td>${ms.map(mm => { acc += dd.tot[mm]; return `<td class="num">${pc ? P(acc / base) : K(acc)}</td>`; }).join('')}</tr>
+   <tr><td>Realizado no mês</td><td class="num">${cel(real)}</td>${ms.map(mm => `<td class="num">${mm <= hj ? cel(realMes[mm] || 0) || '0' : ''}</td>`).join('')}</tr>
+   <tr><td>Realizado acumulado</td><td></td>${ms.map((mm, i) => { accR += (realMes[mm] || 0) + (i === 0 ? antes : 0); return `<td class="num">${mm <= hj ? (pc ? P(accR / base) : K(accR)) : ''}</td>`; }).join('')}</tr>
+   </tbody></table></div>${antes ? `<div class="note body">Realizado antes de ${mesLab(ms[0])} (${R0(antes)}) entra no acumulado do primeiro mês.</div>` : ''}</section>
+   <section class="card"><header><h2>Curva S da obra</h2></header><div class="body">${curvaS()}</div></section>`;
+}
+function viewReal(){
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  let l = M.lanc; if (S.lnTp) l = l.filter(x => x.l.tp === S.lnTp); if (S.lnMes) l = l.filter(x => (x.l.data || '').startsWith(S.lnMes));
+  const meses = [...new Set(M.lanc.map(x => (x.l.data || '').slice(0,7)))].sort().reverse();
+  const atOpts = M.ats.map(a => `<option value="${esc(a.id)}">${esc(a.id)} · ${esc(a.tr)} · ${esc(a.nome.slice(0, 60))}</option>`).join('');
+  return `${viewOR()}
+   <div class="grid2">
+   <section class="card"><header><h2>Resumo do realizado</h2></header><div class="body note">Compras ${R0(M.realC)} · medições ${R0(M.realM)}. Lance aqui o que for pago ou entregue (contratos, medições e notas do Sienge). Cada lançamento tem subetapa e categoria (mão de obra, material ou serviços); quando vazias, a subetapa vem da atividade e a categoria vem do tipo (medição = mão de obra, compra = material).</div></section>
+   ${S.canEdit ? `<section class="card"><header><h2>Novo lançamento</h2></header><form class="body form" data-novolanc>
+     <label>Tipo<select name="tp"><option value="M">Medição de contrato</option><option value="C">Compra de material</option></select></label>
+     <label>Data<input name="data" type="date" value="${today()}" required></label>
+     <label>Valor (R$)<input name="v" inputmode="decimal" required></label>
+     <label class="wide">Atividade<select name="at" required><option value="">Escolha a atividade</option>${atOpts}</select></label>
+     <label>Subetapa<input name="sb" list="dl-subs" placeholder="vazio = a da atividade"></label>
+     <label>Categoria<select name="cat"><option value="">Pelo tipo</option>${CATS.map(([c, l]) => `<option value="${c}">${l}</option>`).join('')}</select></label>
+     <label class="wide">Descrição<input name="d" required placeholder="O que foi medido ou comprado"></label>
+     <label>Fornecedor<input name="fo"></label><label>Nº medição / NF / pedido<input name="doc"></label>
+     <label class="wide">Observação<input name="o"></label><div><button class="btn pri">Lançar</button></div></form></section>` : ''}
+  </div>
+  <section class="card"><header><h2>Lançamentos</h2><span class="pill p-mut">${l.length}</span><span class="sp"></span><div class="f">
+    <select id="lnTp" aria-label="Tipo"><option value="">Compras e medições</option><option value="M" ${S.lnTp === 'M' ? 'selected' : ''}>Medições</option><option value="C" ${S.lnTp === 'C' ? 'selected' : ''}>Compras</option></select>
+    <select id="lnMes" aria-label="Mês"><option value="">Todos os meses</option>${meses.map(mm => `<option value="${mm}" ${S.lnMes === mm ? 'selected' : ''}>${mesLab(mm)}</option>`).join('')}</select></div></header>
+   ${l.length ? `<div class="scroll"><table><thead><tr><th>Data</th><th>Tipo</th><th>Atividade</th><th>Subetapa</th><th>Categoria</th><th>Descrição</th><th>Fornecedor</th><th>Documento</th><th class="num">Valor</th><th></th></tr></thead><tbody>
+   ${l.slice(0, 400).map(x => { const k = [x.mid, x.lid]; return `<tr><td>${br(x.l.data)}</td><td>${x.l.tp === 'M' ? '<span class="pill p-acc">Medição</span>' : '<span class="pill p-mut">Compra</span>'}</td>
+     <td style="width:110px">${ed('ln', k, 'at', x.l.at, {w:96, label:'Atividade'})}${!x.n ? '<small class="pill p-warn">inválida</small>' : ''}</td>
+     <td style="width:190px">${ed('ln', k, 'sb', x.l.sb || '', {w:180, label:'Subetapa', list:'dl-subs', ph:x.sb})}</td>
+     <td style="width:130px">${catSel(k, x)}</td>
+     <td class="desc">${ed('ln', k, 'd', x.l.d, {label:'Descrição'})}</td><td>${esc(x.l.fo)}</td><td class="mono">${esc(x.l.doc)}</td>
+     <td style="width:130px">${ed('ln', k, 'v', x.l.v, {num:true, w:120, label:'Valor'})}</td><td>${S.canEdit ? `<button class="btn sm del" data-dellanc="${x.mid}|${x.lid}">Excluir</button>` : ''}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Nenhum lançamento neste filtro.</div>'}</section>`;
+}
+
+function catSel(k, x){
+  const id = ['ln', ...k, 'cat'].join('__').replace(/[^A-Za-z0-9_-]/g, '_');
+  const opts = (x.cat === 'MIX' ? [['MIX', 'MO + material']] : []).concat(CATS);
+  return `<select class="e" id="${id}" data-kind="ln" data-keys="${esc(k.join('|'))}" data-f="cat"${S.canEdit ? '' : ' disabled'} aria-label="Categoria">${opts.map(([c, l]) => `<option value="${c}" ${c === x.cat ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+}
+// orçado × realizado por etapa e subetapa, separando mão de obra, material e serviços
+function viewOR(){
+  const ns = Object.keys(M.rs).map(Number).sort((a, b) => (a || 99) - (b || 99));
+  const nome = n => n ? pad(n) + ' · ' + ((M.etapas[n] || {}).nome || 'Etapa ' + n) : 'Sem atividade válida';
+  const z = () => ({ oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0 });
+  const add = (a, b) => { for (const k in a) a[k] += b[k]; return a; };
+  const tot = z();
+  const cel = v => Math.abs(v) < 0.5 ? '<span class="muted">–</span>' : K(v);
+  const cols = (g, cls) => { const o = g.oMO + g.oMAT + g.oSV, r = g.rMO + g.rMAT + g.rSV, s = o - r;
+    return `<td class="num">${cel(g.oMO)}</td><td class="num">${cel(g.oMAT)}</td><td class="num">${cel(g.oSV)}</td><td class="num"><b>${cel(o)}</b></td>
+      <td class="num" style="${g.rMO > g.oMO + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rMO)}</td><td class="num" style="${g.rMAT > g.oMAT + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rMAT)}</td><td class="num" style="${g.rSV > g.oSV + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rSV)}</td><td class="num"><b>${cel(r)}</b></td>
+      <td class="num" style="${s < -0.5 ? 'color:var(--bad)' : ''}">${K(s)}</td><td class="num">${o ? P(r / o) : (r ? '<span class="pill p-bad">sem orçado</span>' : '')}</td>`; };
+  let linhas = '';
+  for (const n of ns) {
+    const subs = Object.entries(M.rs[n]).sort((a, b) => (b[1].oMO + b[1].oMAT + b[1].oSV) - (a[1].oMO + a[1].oMAT + a[1].oSV));
+    const ge = subs.reduce((acc, [, g]) => add(acc, g), z()); add(tot, ge);
+    const k = 'r' + n, ab = S.orExp || S.open[k];
+    linhas += `<tr class="grp click" data-tog="${k}" aria-expanded="${!!ab}"><td>${ab ? '▾' : '▸'} ${esc(nome(n))}</td>${cols(ge)}</tr>`;
+    if (ab) linhas += subs.map(([sb, g]) => `<tr><td style="padding-left:26px">${esc(sb)}</td>${cols(g)}</tr>`).join('');
+  }
+  return `<section class="card"><header><h2>Orçado × realizado por subetapa</h2><span class="note">Valores em R$. Mão de obra, material e serviços saem dos insumos das composições (orçado) e da categoria de cada lançamento (realizado). Clique numa etapa para abrir as subetapas. Vermelho = realizado acima do orçado.</span><span class="sp"></span>
+    <button class="btn" data-act="${S.orExp ? 'or-recolher' : 'or-expandir'}">${S.orExp ? 'Recolher subetapas' : 'Abrir todas as subetapas'}</button></header>
+    <div class="scroll"><table><thead>
+     <tr><th rowspan="2">Etapa / subetapa</th><th class="num" colspan="4" style="text-align:center">Orçado</th><th class="num" colspan="4" style="text-align:center">Realizado</th><th class="num" rowspan="2">Saldo</th><th class="num" rowspan="2">%</th></tr>
+     <tr><th class="num">Mão de obra</th><th class="num">Material</th><th class="num">Serviços</th><th class="num">Total</th><th class="num">Mão de obra</th><th class="num">Material</th><th class="num">Serviços</th><th class="num">Total</th></tr></thead><tbody>
+    ${linhas}
+    <tr class="tot"><td>Total da obra</td>${cols(tot)}</tr></tbody></table></div></section>`;
+}
+
+async function viewHist(){
+  const es = []; for (const d of Object.values(S.hist)) for (const [id, e] of Object.entries(d.l || {})) es.push(e);
+  es.sort((a, b) => (b.t || '').localeCompare(a.t || ''));
+  const top = es.slice(0, 300);
+  let ps = {}; if (user) { const ids = [...new Set(top.map(e => e.u).filter(Boolean))]; if (ids.length) try { ps = await user.profiles(ids); } catch (e) {} }
+  const nome = u => (ps[u] && ps[u].name) || (u ? 'Alguém da equipe' : 'Carga inicial');
+  return `<section class="card"><header><h2>Histórico de alterações</h2><span class="note">Toda mudança feita aqui fica registrada com quem fez e quando.</span></header>
+   ${top.length ? `<div class="scroll"><table><thead><tr><th>Quando</th><th>Quem</th><th>O que mudou</th></tr></thead><tbody>${top.map(e => { const d = new Date(e.t); return `<tr><td>${d.toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'})}</td><td>${esc(nome(e.u))}</td><td>${esc(e.a)}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Nenhuma alteração registrada ainda. As mudanças no orçamento, cronograma e realizado aparecem aqui.</div>'}</section>`;
+}
+
+// ---------- fotos da obra
+const fotoSrc = id => window.__fotoUrl ? window.__fotoUrl(id) : '/_blob/' + id;
+function listaFotos(){
+  const dias = [];
+  for (const [did, d] of Object.entries(S.fotos)) {
+    const fs = Object.entries(d.f || {}).filter(([, f]) => !f.x && f.a).map(([fid, f]) => ({ did, fid, ...f })).sort((a, b) => (a.ord || 0) - (b.ord || 0));
+    if (fs.length) dias.push({ did, data: d.data || '', resumo: d.resumo || '', fs });
+  }
+  return dias.sort((a, b) => b.data.localeCompare(a.data));
+}
+function viewFotos(){
+  const dias = listaFotos();
+  const form = assetsNS && S.canEdit ? `<section class="card"><header><h2>Incluir fotos</h2><span class="note">Escolha uma ou mais fotos do dia. A legenda vale para todas; depois dá para mudar uma a uma.</span></header>
+    <form class="body form" data-novafoto>
+     <label>Data das fotos<input name="data" type="date" value="${today()}" required></label>
+     <label class="wide">Legenda<input name="leg" placeholder="ex.: T1 — fôrma montada para a 1ª concretagem"></label>
+     <label class="wide">Fotos<input name="arq" type="file" accept="image/jpeg,image/png,image/webp" multiple required></label>
+     <div><button class="btn pri" type="submit">Enviar fotos</button></div></form></section>` : '';
+  const corpo = dias.length ? dias.map(d => `<section class="card"><header><h2>${br(d.data).slice(0, 5)}/${d.data.slice(0, 4)}</h2><span class="pill p-mut">${d.fs.length} ${d.fs.length === 1 ? 'foto' : 'fotos'}</span>${d.resumo ? `<span class="note">${esc(d.resumo)}</span>` : ''}</header>
+    <div class="body fotos-dia">${d.fs.map((f, i) => `<figure class="foto"><button class="ver" data-foto="${esc(d.did)}|${i}" aria-label="Ampliar foto: ${esc(f.leg || 'sem legenda')}"><img src="${esc(fotoSrc(f.a))}" alt="${esc(f.leg || 'Foto da obra')}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'falta',textContent:'Foto indisponível'}))"></button>
+      <figcaption>${S.canEdit ? ed('foto', [d.did, f.fid], 'leg', f.leg, {label:'Legenda'}) : esc(f.leg || '')}</figcaption>
+      ${S.canEdit ? `<div><button class="btn sm del" data-delfoto="${esc(d.did)}|${esc(f.fid)}">Tirar do app</button></div>` : ''}</figure>`).join('')}</div></section>`).join('')
+    : `<div class="card"><div class="empty">Nenhuma foto ainda.${assetsNS ? ' Use o formulário acima para incluir as fotos da obra.' : ''}</div></div>`;
+  return form + corpo;
+}
+function lightbox(){
+  let root = document.getElementById('lb-root');
+  if (!root) { root = document.createElement('div'); root.id = 'lb-root'; document.body.appendChild(root); }
+  if (!S.lb) { root.innerHTML = ''; return; }
+  const d = listaFotos().find(x => x.did === S.lb.did); if (!d) { S.lb = null; root.innerHTML = ''; return; }
+  const i = Math.max(0, Math.min(d.fs.length - 1, S.lb.i)); const f = d.fs[i];
+  root.innerHTML = `<div class="lb" role="dialog" aria-modal="true" aria-label="Foto ampliada"><div class="nav">${d.fs.length > 1 ? `<button class="btn" data-lbmv="-1" aria-label="Foto anterior">‹</button><button class="btn" data-lbmv="1" aria-label="Próxima foto">›</button>` : ''}<button class="btn" data-lbclose aria-label="Fechar">Fechar</button></div>
+   <img src="${esc(fotoSrc(f.a))}" alt="${esc(f.leg || 'Foto da obra')}"><div class="cap">${br(d.data)} · ${i + 1} de ${d.fs.length}${f.leg ? ' · ' + esc(f.leg) : ''}</div></div>`;
+}
+async function enviarFotos(form){
+  const fd = new FormData(form); const data = fd.get('data'); const leg = String(fd.get('leg') || '').trim();
+  const arqs = [...form.querySelector('input[type=file]').files];
+  if (!data || !arqs.length) return toast('Escolha a data e as fotos.');
+  if (!assetsNS) return toast('Envio de fotos indisponível nesta visualização.');
+  const did = 'd' + data.replace(/-/g, ''); const atual = S.fotos[did];
+  let ord = Math.max(0, ...Object.values((atual && atual.f) || {}).map(f => f.ord || 0));
+  const btn = form.querySelector('button[type=submit]'); btn.disabled = true;
+  let ok = 0;
+  for (const a of arqs) {
+    toast(`Enviando foto ${ok + 1} de ${arqs.length}…`);
+    try {
+      const r = await assetsNS.upload(a);
+      ord++;
+      if (await salvar('fotos/' + did, { data, f: { [uid('f')]: { a: r.id, leg, ord } } }, null, { data, resumo: '', f: {} })) ok++;
+    } catch (e) {
+      const c = e && e.code;
+      toast(c === 'too_large' ? 'Foto acima de 20 MB: reduza e tente de novo.' : c === 'unsupported_type' ? 'Use fotos JPG, PNG ou WEBP.' : c === 'quota_or_state' ? 'O espaço de fotos do app acabou.' : 'Não enviou a foto. Tente de novo.');
+      break;
+    }
+  }
+  btn.disabled = false;
+  if (ok) { registrar(`Fotos: ${ok} ${ok === 1 ? 'foto incluída' : 'fotos incluídas'} em ${br(data)}${leg ? ' (' + leg + ')' : ''}`); form.reset(); toast(ok === arqs.length ? 'Fotos enviadas.' : `${ok} de ${arqs.length} fotos enviadas.`); }
+}
+
+// ---------- gaveta da composição
+function drawer(){
+  const root = document.getElementById('drawer-root');
+  if (!S.drawer) { root.innerHTML = ''; return; }
+  const { c, eid, iid } = S.drawer; const cp = S.comps[c];
+  const it = eid && S.orc[eid] && S.orc[eid].itens[iid];
+  let html;
+  if (!cp) html = `<div class="alert bad">O código ${esc(c)} não tem composição cadastrada. Troque o código do item por uma composição existente.</div>`;
+  else {
+    const uso = M.usoComp[c] || 0; const doc = S.compDoc[c];
+    html = `${cp.b ? `<div class="note">${esc(cp.b)}</div>` : ''}
+     ${uso > 1 ? `<div class="alert warn">Esta composição é usada em ${uso} itens do orçamento. Mudar um coeficiente aqui muda todos eles.</div>` : ''}
+     <div class="scroll"><table><thead><tr><th>Tipo</th><th>Código</th><th>Descrição</th><th>Un</th><th class="num">Coeficiente</th><th class="num">Preço</th><th class="num">Parcial</th></tr></thead><tbody>
+     ${(cp.it || []).map((l, i) => { const inf = linhaInfo(l); const p = linhaPreco(l); const sub = l.t === 'C' && S.comps[l.c];
+       return `<tr><td>${l.t === 'I' ? 'Insumo' : 'Composição'}</td><td class="mono">${sub ? `<a href="#" data-comp="${esc(l.c)}">${esc(l.c)}</a>` : esc(l.c)}</td><td class="desc">${esc(inf.d)}</td><td>${esc(inf.u)}</td>
+        <td style="width:110px">${ed('coef', [doc, c, String(i)], 'k', l.k, {num:true, w:100, label:'Coeficiente'})}</td>
+        <td style="width:120px">${l.t === 'I' && S.ins[l.c] ? ed('ins', [l.c], 'p', preco(l.c), {num:true, w:110, label:'Preço do insumo'}) : `<span class="num">${R(p)}</span>`}</td>
+        <td class="num">${R((l.k || 0) * p)}</td></tr>`; }).join('')}
+     <tr class="tot"><td colspan="6">Custo unitário${cp.sinapi ? ` <span class="muted">(SINAPI oficial ${R(cp.sinapi)})</span>` : ''}</td><td class="num">${R(custoComp(c))}</td></tr></tbody></table></div>
+     ${S.canEdit ? `<form class="form" data-novalinha="${esc(doc)}|${esc(c)}"><label>Tipo<select name="t"><option value="I">Insumo</option><option value="C">Composição</option></select></label><label>Código<input name="c" required list="dl-ins"></label><label>Coeficiente<input name="k" inputmode="decimal" required></label><div><button class="btn">Incluir linha</button></div></form><p class="note">Coeficiente zero tira a linha da conta sem apagar o histórico.</p>` : ''}`;
+  }
+  const head = it ? `<div class="note">Item ${esc(it.item || '')} · ${nf4.format(it.q || 0)} ${esc(cp ? cp.u : '')} · total ${R((it.q || 0) * (cp ? custoComp(c) : 0))}</div>` : '';
+  root.innerHTML = `<div class="shade" data-close></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-t"><header><div style="flex:1;min-width:0"><div class="mono muted">${esc(c)}${cp && cp.pr ? ' · composição própria' : cp ? ' · SINAPI' : ''}</div><h2 id="dr-t">${esc(cp ? cp.d : 'Código sem composição')}</h2>${head}</div><button class="btn" data-close aria-label="Fechar">Fechar</button></header><div class="in">${html}</div></aside>`;
+}
+
+// ---------- render
+let renderSeq = 0;
+async function render(){
+  const seq = ++renderSeq;
+  const act = document.activeElement; const fid = act && act.id; const sel = act && act.selectionStart != null ? [act.selectionStart, act.selectionEnd] : null;
+  const sy = window.scrollY;
+  renderTabs();
+  const main = document.getElementById('main');
+  if (S.noDb) { main.innerHTML = `<div class="card"><div class="empty">Não foi possível abrir a base da obra. Confira a internet e entre de novo.</div></div>`; return; }
+  if (!(S.got.obra && S.got.orc && S.got.comp && S.got.lanc)) { renderTop(); return; }
+  if (!S.cfg) { main.innerHTML = `<div class="card"><div class="empty">A base da obra ainda está vazia. A engenharia carrega o orçamento e o cronograma a partir da planilha do Madrid.</div></div>`; return; }
+  M = calc(); renderTop();
+  let h = '';
+  switch (S.tab) {
+    case 'painel': h = viewPainel(); break;
+    case 'fotos': h = viewFotos(); break;
+    case 'orcamento': h = viewOrc(); break;
+    case 'insumos': h = viewIns(); break;
+    case 'cronograma': h = viewCrono(); break;
+    case 'ff': h = viewFF(); break;
+    case 'realizado': h = viewReal(); break;
+    case 'historico': h = await viewHist(); if (seq !== renderSeq) return; break;
+  }
+  main.innerHTML = h + datalists();
+  drawer(); lightbox();
+  if (fid) { const el = document.getElementById(fid); if (el) { el.focus({preventScroll:true}); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) {} } }
+  window.scrollTo(0, sy);
+}
+let dlCache = '';
+function datalists(){
+  const subs = [...new Set(M.itens.map(r => r.sb))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  return `<datalist id="dl-subs">${subs.map(s => `<option value="${esc(s)}"></option>`).join('')}</datalist>` + dlBase();
+}
+function dlBase(){
+  if (!dlCache) dlCache = `<datalist id="dl-comps">${Object.entries(S.comps).map(([c, v]) => `<option value="${esc(c)}">${esc(v.d.slice(0, 90))}</option>`).join('')}</datalist><datalist id="dl-ins">${Object.entries(S.ins).map(([c, v]) => `<option value="${esc(c)}">${esc(v.d.slice(0, 90))}</option>`).join('')}</datalist>`;
+  return dlCache;
+}
+let rq = 0; function later(){ cancelAnimationFrame(rq); rq = requestAnimationFrame(() => render()); }
+
+// ---------- edição inline
+async function aoMudar(el){
+  const kind = el.dataset.kind; if (!kind) return;
+  const keys = el.dataset.keys.split('|'), f = el.dataset.f;
+  let v = el.value.trim();
+  if (el.dataset.num) { if (v === '') v = null; else { v = num(v); if (v == null) { toast('Número inválido. Use 1.234,56 ou 1234.56'); later(); return; } if (el.dataset.pct) v = v / 100; } }
+  if (kind === 'it') {
+    const [eid, iid] = keys; const it = S.orc[eid].itens[iid]; if (f === 'c' && v && !S.comps[v]) toast('Código sem composição: o item fica com custo zero até corrigir.');
+    if (f === 'at') v = v.replace(/\s/g, '').replace(/;/g, ',');
+    await salvar('orc/' + eid, { itens: { [iid]: { [f]: v } } }, `Orçamento item ${it.item || iid}: ${campo(f)} ${fmtV(it[f])} → ${fmtV(v)}`);
+  } else if (kind === 'ins') {
+    const [c] = keys; const old = S.ins[c] && S.ins[c][f];
+    await salvar('obra/insumos', { ins: { [c]: { [f]: v } } }, `Insumo ${c}: ${f === 'p' ? 'preço adotado' : 'base do preço'} ${fmtV(old)} → ${fmtV(v)}`);
+  } else if (kind === 'coef') {
+    const [doc, c, i] = keys; const it = (S.comps[c].it || []).map(l => ({ ...l })); const old = it[+i].k; it[+i].k = v || 0;
+    await salvar('comp/' + doc, { comps: { [c]: { it } } }, `Composição ${c}: coeficiente de ${it[+i].c} ${fmtV(old)} → ${fmtV(v)}`);
+  } else if (kind === 'cfg') {
+    if (keys[0] === 'bdi') await salvar('obra/config', { bdi: { [f]: v || 0 } }, `BDI ${f}: ${P(S.cfg.bdi[f], 2)} → ${P(v, 2)}`);
+    else await salvar('obra/config', { [f]: v }, `Meta de custo: ${R0(S.cfg[f])} → ${R0(v)}`);
+  } else if (kind === 'at') {
+    const [id] = keys; const a = S.at[id]; const p = {};
+    if (f === 'dur') { const d = Math.max(1, Math.round(v || 1)); p.dur = d; p.fim = addDays(a.ini, d - 1); }
+    else if (f === 'ini') { if (!v) { later(); return; } p.ini = v; p.fim = addDays(v, Math.max(1, a.dur || 1) - 1); }
+    else if (f === 'fim') { if (!v || v < a.ini) { toast('O fim não pode ser antes do início.'); later(); return; } p.fim = v; p.dur = diff(a.ini, v) + 1; }
+    else if (f === 'pct') { p.pct = Math.max(0, Math.min(1, v || 0)); if (p.pct >= 1 && !a.fimR) p.fimR = today(); if (p.pct > 0 && !a.iniR) p.iniR = a.ini <= today() ? a.ini : today(); }
+    else if (f === 'pred') { const ids = v.split(/[;,]/).map(s => s.trim()).filter(Boolean); const bad = ids.filter(x => !S.at[x]); if (bad.length) { toast('Atividade não existe: ' + bad.join(', ')); later(); return; } p.pred = ids.join(';'); }
+    else p[f] = v;
+    let out = { [id]: p }, mov = 0;
+    if ('fim' in p || 'pred' in p || 'fimR' in p || 'ini' in p) ({ out, mov } = propagar(out));
+    const ok = await salvar('obra/atividades', { at: out }, `Cronograma ${id}: ${campo(f)} ${fmtV(a[f])} → ${fmtV(p[f] ?? v)}${mov ? ` (${mov} sucessoras empurradas)` : ''}`);
+    if (ok && mov) toast(`${mov} atividades sucessoras foram empurradas.`);
+  } else if (kind === 'foto') {
+    const [did, fid] = keys; const f = (S.fotos[did] && S.fotos[did].f || {})[fid] || {};
+    await salvar('fotos/' + did, { f: { [fid]: { leg: v } } }, `Fotos ${br(S.fotos[did].data)}: legenda ${fmtV(f.leg)} → ${fmtV(v)}`);
+  } else if (kind === 'ln') {
+    const [mid, lid] = keys; const l = S.lanc[mid].l[lid];
+    if (f === 'at' && v && !S.at[v]) { toast('Atividade não existe: ' + v); later(); return; }
+    if (f === 'cat') { if (v === 'MIX') return; await salvar('lanc/' + mid, { l: { [lid]: { cat: v, mo: null } } }, `Realizado ${br(l.data)} ${l.d}: categoria → ${catNome(v)}`); return; }
+    await salvar('lanc/' + mid, { l: { [lid]: { [f]: v } } }, `Realizado ${br(l.data)} ${l.d}: ${campo(f)} ${fmtV(l[f])} → ${fmtV(v)}`);
+  }
+}
+const campo = f => ({ sb:'subetapa', c:'código', q:'quantidade', at:'atividades', tr:'torre', o:'observação', dur:'duração', ini:'início', fim:'fim', pct:'% executado', iniR:'início real', fimR:'fim real', pred:'predecessoras', v:'valor', d:'descrição', obs:'observação' })[f] || f;
+const fmtV = v => v == null || v === '' ? '(vazio)' : typeof v === 'number' ? nf4.format(v) : String(v).length > 40 ? String(v).slice(0, 40) + '…' : String(v);
+
+// ---------- formulários
+async function aoEnviar(form){
+  const fd = Object.fromEntries(new FormData(form).entries());
+  if (form.dataset.novoitem) {
+    const eid = fd.eid; const e = S.orc[eid]; if (!e) return toast('Escolha a etapa.'); const q = num(fd.q); if (q == null) return toast('Informe a quantidade.');
+    let c = (fd.c || '').trim();
+    const prox = Math.max(0, ...Object.values(e.itens || {}).map(it => +String(it.item || '').split('.')[1] || 0)) + 1;
+    const item = e.n + '.' + pad(prox); const ord = Math.max(0, ...M.itens.map(r => r.it.ord || 0)) + 1;
+    if (fd.tipo === 'verba') {
+      const p = num(fd.p); if (p == null || !fd.d) return toast('Para verba, informe descrição e preço unitário.');
+      let n = 1; while (S.ins['P-' + pad(100 + n).slice(-3)] || S.comps['CP-V' + n]) n++;
+      const pc = 'P-' + String(100 + n); c = 'CP-V' + n;
+      if (!await salvar('obra/insumos', { ins: { [pc]: { d: fd.d.toUpperCase(), u: (fd.u || 'VB').toUpperCase(), cl: 'VERBA / CONTRATO / COTAÇÃO', sinapi: null, p, b: fd.o || 'Verba', o: '' } } })) return;
+      if (!await salvar('comp/novas', { comps: { [c]: { d: fd.d.toUpperCase(), u: (fd.u || 'VB').toUpperCase(), sinapi: null, b: 'Verba ou cotação', pr: true, it: [{ t:'I', c: pc, k: 1 }] } } }, null, { comps: {} })) return;
+    } else if (!S.comps[c]) return toast('Código sem composição. Escolha um da lista ou use verba.');
+    const ok = await salvar('orc/' + eid, { itens: { [uid('n')]: { item, ord, c, tr: fd.tr || 'Geral', sb: (fd.sb || '').trim() || 'Geral', q, at: (fd.at || '').replace(/\s/g, '').replace(/;/g, ','), f: '', b: fd.tipo === 'verba' ? 'Verba / cotação' : '', o: fd.o || '' } } }, `Orçamento: incluído item ${item} (${c}) qtd ${nf4.format(q)}`);
+    if (ok) { form.reset(); toast('Item incluído.'); }
+  } else if (form.hasAttribute('data-novoins')) {
+    const c = fd.c.trim().toUpperCase(); if (S.ins[c]) return toast('Esse código já existe.'); const p = num(fd.p); if (p == null) return toast('Preço inválido.');
+    if (await salvar('obra/insumos', { ins: { [c]: { d: fd.d.toUpperCase(), u: fd.u.toUpperCase(), cl: 'COTAÇÃO', sinapi: null, p, b: fd.b || '', o: '' } } }, `Insumo cadastrado: ${c} ${fd.d} a ${R(p)}`)) { form.reset(); dlCache = ''; toast('Insumo cadastrado.'); }
+  } else if (form.hasAttribute('data-novaat')) {
+    const id = fd.id.trim(); if (!/^\d+(\.\d+)+$/.test(id)) return toast('ID no formato 9.9 ou 8.1.13.'); if (S.at[id] && !S.at[id].x) return toast('Esse ID já existe.');
+    const dur = Math.max(1, Math.round(num(fd.dur) || 1)); const ord = Math.max(0, ...Object.values(S.at).map(a => a.ord || 0)) + 1;
+    const pred = (fd.pred || '').split(/[;,]/).map(s => s.trim()).filter(Boolean); const bad = pred.filter(x => !S.at[x]); if (bad.length) return toast('Predecessora não existe: ' + bad.join(', '));
+    let out = { [id]: { ord, et: fd.et, sub: '', nome: fd.nome, tr: fd.tr || 'Geral', dur, pred: pred.join(';'), ini: fd.ini, fim: addDays(fd.ini, dur - 1), pct: 0, iniR: '', fimR: '', obs: '' } };
+    if (await salvar('obra/atividades', { at: out }, `Cronograma: incluída atividade ${id} ${fd.nome}`)) { form.reset(); toast('Atividade incluída. Ligue itens do orçamento a ela pela coluna Atividades.'); }
+  } else if (form.hasAttribute('data-novolanc')) {
+    const v = num(fd.v); if (v == null) return toast('Valor inválido.'); if (!fd.at) return toast('Escolha a atividade.');
+    const mes = fd.data.slice(0, 7);
+    if (await salvar('lanc/m' + mes.replace('-', ''), { l: { [uid('l')]: { tp: fd.tp, data: fd.data, at: fd.at, sb: (fd.sb || '').trim(), cat: fd.cat || '', d: fd.d, fo: fd.fo || '', v, doc: fd.doc || '', o: fd.o || '' } } }, `Realizado: ${fd.tp === 'M' ? 'medição' : 'compra'} ${br(fd.data)} ${fd.d} ${R(v)} (ativ. ${fd.at})`, { mes, l: {} })) { form.reset(); toast('Lançado.'); }
+  } else if (form.dataset.novalinha) {
+    const [doc, c] = form.dataset.novalinha.split('|'); const k = num(fd.k); const cc = fd.c.trim();
+    if (k == null) return toast('Coeficiente inválido.'); if (fd.t === 'I' ? !S.ins[cc] : !S.comps[cc]) return toast('Código não encontrado na base.');
+    const it = [...(S.comps[c].it || []).map(l => ({ ...l })), { t: fd.t, c: cc, k }];
+    if (await salvar('comp/' + doc, { comps: { [c]: { it } } }, `Composição ${c}: incluída linha ${cc} coef. ${nf4.format(k)}`)) form.reset();
+  }
+}
+
+// ---------- exportação Excel
+async function exportar(){
+  const dl = await claude.use('downloads'); if (!dl) return toast('Exportação indisponível nesta visualização.');
+  toast('Montando a planilha…');
+  if (!window.XLSX) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); }).catch(() => null);
+  if (!window.XLSX) return toast('Não carregou o gerador de planilha. Tente de novo.');
+  const X = window.XLSX, wb = X.utils.book_new();
+  const add = (n, aoa) => X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet(aoa), n);
+  const ets = Object.values(M.etapas).sort((a, b) => a.n - b.n);
+  add('Sintético', [['Etapa', 'Custo (R$)', '% da obra', 'Realizado (R$)'], ...ets.map(e => [e.n + ' ' + e.nome, e.total, e.total / M.total, e.real]), ['CUSTO DA OBRA SEM BDI', M.total, 1, M.real], [], ['Custos diretos', M.diretos], ['Custos indiretos', M.indiretos], ['BDI', M.bdi], ['Preço com BDI', M.preco], ['Meta sem BDI', M.meta]]);
+  add('Orçamento', [['EAP', 'Etapa', 'Subetapa', 'Código', 'Descrição', 'Unid', 'Torre', 'Quantidade', 'Unitário (R$)', 'Total (R$)', 'Atividades', 'Fonte', 'Base', 'Observação', 'Item planilha'],
+    ...ets.flatMap(e => [[pad(e.n), e.nome, '', '', e.nome, '', '', '', '', e.total], ...e.subs.flatMap(s => [[s.cod, e.nome, s.nome, '', s.nome, '', '', '', '', s.total], ...s.itens.map(r => [r.eap, e.nome, s.nome, r.it.c, r.desc, r.unid, r.tr, r.it.q, r.un, r.tot, r.it.at, r.it.f, r.it.b, r.it.o, r.it.item])])])]);
+  add('Por subetapa', [['EAP', 'Etapa', 'Subetapa', ...M.torres, 'Total (R$)', '% da obra'], ...ets.flatMap(e => e.subs.map(s => { const pt = {}; for (const r of s.itens) pt[r.tr] = (pt[r.tr] || 0) + r.tot; return [s.cod, e.nome, s.nome, ...M.torres.map(t => pt[t] || 0), s.total, s.total / M.total]; }))]);
+  add('Por torre', [['Etapa', ...M.torres, 'Total (R$)'], ...ets.map(e => [pad(e.n) + ' ' + e.nome, ...M.torres.map(t => (M.porTorre[e.n] || {})[t] || 0), e.total])]);
+  add('Composições', [['Composição', 'Tipo', 'Código', 'Descrição', 'Unid', 'Coeficiente', 'Preço (R$)', 'Parcial (R$)'], ...Object.entries(S.comps).flatMap(([c, cp]) => [[c, 'CAB', c, cp.d, cp.u, '', custoComp(c), ''], ...(cp.it || []).map(l => { const inf = linhaInfo(l), p = linhaPreco(l); return [c, l.t === 'I' ? 'INSUMO' : 'COMPOSICAO', l.c, inf.d, inf.u, l.k, p, (l.k || 0) * p]; })])]);
+  add('Insumos', [['Código', 'Descrição', 'Unid', 'Classe', 'SINAPI (R$)', 'Adotado (R$)', 'Base', 'Observação'], ...Object.entries(S.ins).map(([c, i]) => [c, i.d, i.u, i.cl, i.sinapi, i.p, i.b, i.o])]);
+  add('Cronograma', [['ID', 'Etapa', 'Atividade', 'Torre', 'Duração', 'Predecessoras', 'Início', 'Fim', 'Folga', 'Crítica', '% exec.', 'Início real', 'Fim real', 'Custo previsto', 'Realizado'], ...M.ats.map(a => [a.id, a.et, a.nome, a.tr, a.dur, a.pred, br(a.ini), br(a.fim), a.folga, a.crit ? 'sim' : '', a.pct || 0, br(a.iniR), br(a.fimR), a.cost, a.real])]);
+  let ac = 0; add('Físico-Financeiro', [['Etapa', ...M.meses.map(mesLab)], ...ets.map(e => [e.n + ' ' + e.nome, ...M.meses.map(mm => (M.ffEt[e.n] || {})[mm] || 0)]), ['Previsto no mês', ...M.meses.map(mm => M.ffTot[mm])], ['Previsto acumulado', ...M.meses.map(mm => (ac += M.ffTot[mm]))], ['Realizado no mês', ...M.meses.map(mm => M.realMes[mm] || 0)]]);
+  add('Realizado', [['Data', 'Tipo', 'Atividade', 'Subetapa', 'Categoria', 'Descrição', 'Fornecedor', 'Documento', 'Valor (R$)', 'Observação'], ...M.lanc.map(x => [br(x.l.data), x.l.tp === 'M' ? 'Medição' : 'Compra', x.l.at, x.sb, x.cat === 'MIX' ? 'MO + material' : catNome(x.cat), x.l.d, x.l.fo, x.l.doc, x.l.v, x.l.o])]);
+  add('Orçado x realizado', [['Etapa', 'Subetapa', 'Orçado MO', 'Orçado material', 'Orçado serviços', 'Orçado total', 'Realizado MO', 'Realizado material', 'Realizado serviços', 'Realizado total', 'Saldo'], ...Object.keys(M.rs).map(Number).sort((a, b) => a - b).flatMap(n => Object.entries(M.rs[n]).map(([sb, g]) => { const o = g.oMO + g.oMAT + g.oSV, r = g.rMO + g.rMAT + g.rSV; return [n ? n + ' ' + ((M.etapas[n] || {}).nome || '') : 'Sem atividade', sb, g.oMO, g.oMAT, g.oSV, o, g.rMO, g.rMAT, g.rSV, r, o - r]; }))]);
+  const buf = X.write(wb, { bookType: 'xlsx', type: 'array' });
+  try { await dl.save({ filename: 'Madrid-Orcamento-Cronograma-' + today() + '.xlsx', data: new Uint8Array(buf) }); toast('Planilha salva.'); }
+  catch (e) { if (e && e.code !== 'declined') toast('Não foi possível salvar a planilha.'); }
+}
+
+// ---------- eventos
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-tab],[data-go],[data-et],[data-tog],[data-ft],[data-comp],[data-close],[data-delitem],[data-dellanc],[data-crv],[data-ff],[data-act],[data-foto],[data-lbmv],[data-lbclose],[data-delfoto]'); if (!t) return;
+  if (t.dataset.foto) { const [did, i] = t.dataset.foto.split('|'); S.lb = { did, i: +i }; lightbox(); return; }
+  if (t.dataset.lbmv) { const d = listaFotos().find(x => x.did === S.lb.did); if (d) S.lb.i = (S.lb.i + +t.dataset.lbmv + d.fs.length) % d.fs.length; lightbox(); return; }
+  if (t.hasAttribute('data-lbclose')) { S.lb = null; lightbox(); return; }
+  if (t.dataset.delfoto) { const [did, fid] = t.dataset.delfoto.split('|'); if (t.dataset.sure) { await salvar('fotos/' + did, { f: { [fid]: { x: true } } }, `Fotos ${br(S.fotos[did].data)}: foto tirada do app`); } else { t.dataset.sure = '1'; t.textContent = 'Confirmar'; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = 'Tirar do app'; } }, 4000); } return; }
+  if (t.dataset.tab || t.dataset.go) { S.tab = t.dataset.tab || t.dataset.go; S.drawer = null; render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.et && !ev.target.closest('input,a,button,select')) { S.tab = 'orcamento'; S.open['e' + t.dataset.et] = true; render(); return; }
+  if (t.dataset.tog && !ev.target.closest('input,a,button,select')) { const k = t.dataset.tog; if (S.exp) { S.exp = false; } S.open[k] = !S.open[k]; render(); return; }
+  if (t.dataset.ft != null) { ev.preventDefault(); const [n, tr] = t.dataset.ft.split('|'); S.oEt = n; S.oTorre = tr; S.oSub = ''; S.q = ''; render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.act === 'limpar') { S.oEt = ''; S.oTorre = ''; S.oSub = ''; S.q = ''; render(); return; }
+  if (t.dataset.act === 'expandir') { S.exp = true; render(); return; }
+  if (t.dataset.act === 'or-expandir') { S.orExp = true; render(); return; }
+  if (t.dataset.act === 'or-recolher') { S.orExp = false; for (const k in S.open) if (k[0] === 'r') delete S.open[k]; render(); return; }
+  if (t.dataset.act === 'recolher') { S.exp = false; S.open = {}; render(); return; }
+  if (t.dataset.comp) { ev.preventDefault(); S.drawer = { c: t.dataset.comp, eid: t.dataset.eid || (S.drawer && S.drawer.eid), iid: t.dataset.iid || (S.drawer && S.drawer.iid) }; drawer(); return; }
+  if (t.hasAttribute('data-close')) { S.drawer = null; drawer(); return; }
+  if (t.dataset.delitem) { const [eid, iid] = t.dataset.delitem.split('|'); const it = S.orc[eid].itens[iid]; if (t.dataset.sure) { await salvar('orc/' + eid, { itens: { [iid]: { x: true } } }, `Orçamento: excluído item ${it.item} (${it.c})`); } else { t.dataset.sure = '1'; t.textContent = 'Confirmar'; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = 'Excluir'; } }, 4000); } return; }
+  if (t.dataset.dellanc) { const [mid, lid] = t.dataset.dellanc.split('|'); const l = S.lanc[mid].l[lid]; if (t.dataset.sure) { await salvar('lanc/' + mid, { l: { [lid]: { x: true } } }, `Realizado: excluído ${br(l.data)} ${l.d} ${R(l.v)}`); } else { t.dataset.sure = '1'; t.textContent = 'Confirmar'; setTimeout(() => { if (t.isConnected) { delete t.dataset.sure; t.textContent = 'Excluir'; } }, 4000); } return; }
+  if (t.dataset.crv) { S.crView = t.dataset.crv; render(); return; }
+  if (t.dataset.ff) { S.ffMode = t.dataset.ff; render(); return; }
+  if (t.dataset.act === 'xlsx') { exportar(); return; }
+});
+document.addEventListener('change', ev => {
+  const el = ev.target;
+  if (el.matches('input.e,select.e')) { aoMudar(el); return; }
+  const map = { crTorre:'crTorre', crEt:'crEt', crSt:'crSt', lnTp:'lnTp', lnMes:'lnMes', oTorre:'oTorre', oEt:'oEt', oSub:'oSub', ffTorre:'ffTorre' };
+  if (map[el.id]) { S[map[el.id]] = el.value; if (el.id === 'oEt') S.oSub = ''; render(); }
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Enter' && ev.target.matches('input.e')) { ev.preventDefault(); ev.target.blur(); }
+  if (S.lb && ev.key === 'Escape') { S.lb = null; lightbox(); return; }
+  if (S.lb && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) { const d = listaFotos().find(x => x.did === S.lb.did); if (d) { S.lb.i = (S.lb.i + (ev.key === 'ArrowRight' ? 1 : -1) + d.fs.length) % d.fs.length; lightbox(); } return; }
+  if (ev.key === 'Escape' && S.drawer) { S.drawer = null; drawer(); }
+});
+let bt; document.addEventListener('input', ev => {
+  if (ev.target.id === 'busca') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.q = v; render(); }, 250); }
+  if (ev.target.id === 'buscaIns') { clearTimeout(bt); const v = ev.target.value; bt = setTimeout(() => { S.insQ = v; render(); }, 250); }
+});
+document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.hasAttribute('data-novafoto')) enviarFotos(ev.target); else aoEnviar(ev.target); });
+
+// ---------- início
+async function boot(){
+  renderTabs();
+  db = await claude.use('db');
+  if (!db) { S.noDb = true; render(); return; }
+  user = await claude.use('user');
+  if (user) { const can = await user.can('data.write'); S.canEdit = can == null ? await user.canEdit() : can; S.uid = await user.id(); }
+  const err = e => { if (e && e.code === 'revoked') { S.noDb = true; render(); } };
+  db.collection('obra').onSnapshot(s => { for (const d of s.docs) { const v = d.data(); if (d.id === 'config') S.cfg = v; else if (d.id === 'insumos') { S.ins = v.ins || {}; dlCache = ''; } else if (d.id === 'atividades') S.at = v.at || {}; } S.got.obra = true; later(); }, err);
+  db.collection('comp').onSnapshot(s => { const c = {}, w = {}; for (const d of s.docs) for (const [k, v] of Object.entries((d.data() || {}).comps || {})) { c[k] = v; w[k] = d.id; } S.comps = c; S.compDoc = w; dlCache = ''; S.got.comp = true; later(); }, err);
+  db.collection('orc').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.orc = o; S.got.orc = true; later(); }, err);
+  db.collection('lanc').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.lanc = o; S.got.lanc = true; later(); }, err);
+  db.collection('fotos').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.fotos = o; if (S.tab === 'fotos' || S.lb) later(); }, err);
+  if (S.canEdit) claude.use('assets').then(a => { assetsNS = a; if (S.tab === 'fotos') later(); });
+  db.collection('hist').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.hist = o; if (S.tab === 'historico') later(); }, err);
+}
+boot();
+</script>
+
+</body></html>
