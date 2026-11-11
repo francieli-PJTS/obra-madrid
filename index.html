@@ -167,7 +167,7 @@ const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, hist
   got:{obra:false, comp:false, orc:false, lanc:false}, canEdit:false, uid:null,
   tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'tabela', crTorre:'', crEt:'', crSt:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
 let db = null, user = null, M = null, assetsNS = null;
-const TABS = [['painel','Painel'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
+const TABS = [['painel','Painel'],['fotos','Fotos da obra'],['orcamento','Orçamento'],['contrat','Contratação'],['insumos','Insumos e curva ABC'],['cronograma','Cronograma'],['ff','Físico-financeiro'],['realizado','Realizado'],['historico','Histórico']];
 
 // ---------- formatação
 const nf2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -253,6 +253,7 @@ function calc(){
       const sp = cp ? splitComp(it.c) : { MO:0, MAT:0, SV:0 }; const ss = sp.MO + sp.MAT + sp.SV;
       row.mo = ss ? tot * sp.MO / ss : 0; row.sv = ss ? tot * sp.SV / ss : 0; row.mat = tot - row.mo - row.sv;
       const g = rsCel(m, e.n, sb); g.oMO += row.mo; g.oMAT += row.mat; g.oSV += row.sv;
+      row.pc = pacoteDe(row);
       for (const a of val) { const t = m.atSb[a] || (m.atSb[a] = {}); const k = e.n + '|' + sb; t[k] = (t[k] || 0) + tot / val.length; }
       const pt = m.porTorre[e.n] || (m.porTorre[e.n] = {}); pt[row.tr] = (pt[row.tr] || 0) + tot; m.torreSet.add(row.tr);
       et.itens.push(row); et.total += tot; m.total += tot; m.itens.push(row);
@@ -285,7 +286,7 @@ function calc(){
     let mo = 0, mat = 0, sv = 0, cat = l.cat || (l.tp === 'C' ? 'MAT' : 'MO');
     if (l.mo != null) { mo = l.mo; mat = v - l.mo; cat = 'MIX'; } else if (cat === 'MO') mo = v; else if (cat === 'SV') sv = v; else mat = v;
     const g = rsCel(m, n, sb); g.rMO += mo; g.rMAT += mat; g.rSV += sv;
-    m.lanc.push({ mid, lid, l, n, sb, cat });
+    m.lanc.push({ mid, lid, l, n, sb, cat, mo, mat, sv });
     if (l.tp === 'M') m.realM += v; else m.realC += v;
     m.realMes[mes] = (m.realMes[mes] || 0) + v;
     m.realEt[n] = (m.realEt[n] || 0) + v;
@@ -328,6 +329,61 @@ function calc(){
   m.semCusto = ats.length ? m.total - Object.values(m.ffTot).reduce((s, v) => s + v, 0) : 0;
   return m;
 }
+// ---------- pacotes de contratação: como a obra compra e terceiriza (independe da etapa do cronograma)
+const GRUPOS = [['adm','Canteiro, equipe e entrega'],['inf','Infraestrutura e fundação'],['est','Estrutura'],['cob','Cobertura'],['ins','Instalações'],['ved','Vedações e forros'],['aca','Acabamentos'],['ext','Áreas externas']];
+const PACOTES = [
+  ['canteiro','adm','Canteiro e instalações provisórias'], ['equipe','adm','Equipe de obra, EPI e resíduos'], ['entrega','adm','Limpeza final, manuais e habite-se'],
+  ['terra','inf','Terraplenagem e valas'], ['contencao','inf','Contenção e muros de arrimo'], ['radier','inf','Fundação (radier)'],
+  ['estr_mo','est','Mão de obra da estrutura (parede de concreto)'], ['concreto','est','Concreto usinado (paredes e lajes)'], ['aco','est','Aço e telas'], ['acess','est','Acessórios de concretagem e de fôrma'], ['controle','est','Controle tecnológico do concreto'],
+  ['metalica','cob','Estrutura metálica da cobertura'], ['telhado','cob','Telhado, calhas e rufos'],
+  ['inst_mo','ins','Mão de obra das instalações (elétrica, hidráulica, lógica e incêndio)','Empreitada única: por isso as linhas de material elétrico, hidráulico e de incêndio aparecem sem mão de obra.'],
+  ['eletrica','ins','Instalações elétricas, lógica e SPDA'], ['hidro','ins','Instalações hidrossanitárias e reservatório'], ['incendio','ins','Prevenção de incêndio'], ['gas','ins','Gás'],
+  ['vedacao','ved','Alvenaria, drywall, reboco e forros'],
+  ['imper','aca','Impermeabilização'], ['contrapiso','aca','Contrapiso e piso cimentado'], ['ceramica','aca','Pisos e revestimentos cerâmicos'], ['pint_int','aca','Pintura interna'], ['pint_ext','aca','Pintura externa (fachada)'],
+  ['esquadrias','aca','Esquadrias de alumínio'], ['portas','aca','Portas de madeira e fechaduras'], ['loucas','aca','Louças e metais'], ['serralheria','aca','Guarda-corpo e serralheria'],
+  ['paviment','ext','Pavimentação, calçadas e vagas'], ['muros','ext','Muro, gradil e paisagismo'], ['guarita','ext','Guarita, lixeira, GLP e casa de bombas'], ['mobiliario','ext','Mobiliário das áreas comuns'],
+  ['outros','ext','Sem pacote definido']
+];
+const PAC = Object.fromEntries(PACOTES.map(([k, g, nome, nota]) => [k, { k, g, nome, nota }]));
+const PAC_SB = {
+  'Instalações do canteiro':'canteiro', 'Locação da obra':'canteiro', 'Equipe':'equipe', 'Limpeza e vistoria':'entrega', 'Habite-se':'entrega',
+  'Movimento de terra':'terra', 'Valas (escavação e reaterro)':'terra', 'Contenção':'contencao',
+  'Radier':'radier', 'Radier (realizado)':'radier', 'Projeto das fundações':'radier',
+  'Sistema de fôrmas':'acess', 'Mão de obra da estrutura':'estr_mo', 'Concreto das paredes':'concreto', 'Concreto das lajes':'concreto', 'Aço e telas':'aco', 'Acessórios de concretagem':'acess', 'Controle tecnológico':'controle',
+  'Estrutura metálica':'metalica', 'Telhamento':'telhado', 'Calhas e rufos':'telhado',
+  'Mão de obra das instalações':'inst_mo', 'Elétrica, lógica e telefonia':'eletrica', 'Rede elétrica, telefonia e SPDA':'eletrica',
+  'Hidrossanitário':'hidro', 'Rede de água':'hidro', 'Rede de esgoto e pluvial':'hidro', 'Redes sob as torres (realizado)':'hidro', 'Reservatório e incêndio':'hidro',
+  'Prevenção de incêndio':'incendio', 'Rede de incêndio':'incendio', 'Gás':'gas', 'Rede de gás':'gas',
+  'Drywall e alvenaria':'vedacao', 'Impermeabilização':'imper', 'Contrapiso':'contrapiso', 'Piso cerâmico':'ceramica', 'Revestimento de parede':'ceramica',
+  'Massa e preparo':'pint_int', 'Pintura interna':'pint_int', 'Fachada':'pint_ext', 'Esquadrias de alumínio':'esquadrias', 'Portas de madeira':'portas',
+  'Louças e metais':'loucas', 'Playground':'loucas', 'Guarda-corpo e serralheria':'serralheria',
+  'Pavimentação':'paviment', 'Muros e paisagismo':'muros', 'Guarita, gás e lixo':'guarita'
+};
+// o código da composição manda (o salão de festas, por exemplo, tem um pouco de cada pacote)
+const PAC_COD = {};
+for (const [k, cs] of Object.entries({
+  vedacao: ['96110','104757','96111','87905','104958','103328','96360','96370'],
+  hidro: ['97902','99253','89708','98110','95657','95674','102111','102113','CP-CASTELO'],
+  incendio: ['96765','102118','106496','101911','101908','101906','106491','CP-034'],
+  eletrica: ['97597','101632','97605','C12388'],
+  contencao: ['100350','102722'],
+  radier: ['CP-RADIER','97084','95241','97087','97093'],
+  telhado: ['92569','94189','100434'],
+  pint_int: ['88485','88497','88494','104641','104639','104640','100752'],
+  pint_ext: ['104642','88411','95305','CP-058'],
+  contrapiso: ['CP-CONTRAPISO-AN','87640','106788'],
+  ceramica: ['87263','88650','98689','CP-REV-PORC'],
+  esquadrias: ['94570','94569','100702'],
+  portas: ['91333','91321','91304','91307','91305'],
+  loucas: ['CP-LOUCAS','86886','86882','86883','86879','86913','86932','86904','86902','86906','100853','100872','100871','100870','100865','86935'],
+  muros: ['CP-043','CP-021'], mobiliario: ['CP-057'], estr_mo: ['CP-007','CP-047']
+})) for (const c of cs) PAC_COD[c] = k;
+function pacoteDe(r){
+  if (r.it.pc && PAC[r.it.pc]) return r.it.pc;
+  const c = String(r.it.c || '');
+  return PAC_COD[c] || PAC_COD[c.replace(/^M-/, '')] || PAC_SB[r.sb] || 'outros';
+}
+
 function rsCel(m, n, sb){ const e = m.rs[n] || (m.rs[n] = {}); return e[sb] || (e[sb] = { oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0 }); }
 // subetapa do orçamento com mais custo ligada à atividade (de preferência na mesma etapa)
 function sbDominante(m, at, n){
@@ -717,6 +773,62 @@ function viewOR(){
     <tr class="tot"><td>Total da obra</td>${cols(tot)}</tr></tbody></table></div></section>`;
 }
 
+// orçado por pacote de contratação, com o custo por unidade de cada serviço (teto para negociar)
+function pacotes(){
+  const P = {};
+  const pk = k => P[k] || (P[k] = { k, oMO:0, oMAT:0, oSV:0, r:0, rMO:0, lin:new Map() });
+  const sbVal = {};
+  for (const r of M.itens) {
+    const p = pk(r.pc); p.oMO += r.mo; p.oMAT += r.mat; p.oSV += r.sv;
+    const key = r.it.c + '|' + r.unid; let l = p.lin.get(key);
+    if (!l) { l = { c:r.it.c, desc:r.desc, unid:r.unid, q:0, mo:0, mat:0, sv:0, trs:new Set(), sbs:new Set(), eid:r.eid, iid:r.iid }; p.lin.set(key, l); }
+    l.q += r.it.q || 0; l.mo += r.mo; l.mat += r.mat; l.sv += r.sv; l.trs.add(r.tr); l.sbs.add(r.sb);
+    const t = sbVal[r.sb] || (sbVal[r.sb] = {}); t[r.pc] = (t[r.pc] || 0) + r.tot;
+  }
+  // realizado: pela subetapa do lançamento
+  for (const x of M.lanc) {
+    let k = PAC_SB[x.sb];
+    if (!k && sbVal[x.sb]) k = Object.entries(sbVal[x.sb]).sort((a, b) => b[1] - a[1])[0][0];
+    const p = pk(k || 'outros'); p.r += x.l.v || 0; p.rMO += x.mo || 0;
+  }
+  return P;
+}
+function viewContrat(){
+  const P = pacotes();
+  const cel = v => Math.abs(v) < 0.5 ? '<span class="muted">–</span>' : K(v);
+  const un = v => Math.abs(v) < 0.005 ? '<span class="muted">–</span>' : nf2.format(v);
+  const tot = { oMO:0, oMAT:0, oSV:0, r:0 };
+  let linhas = '';
+  for (const [g, gnome] of GRUPOS) {
+    const ps = PACOTES.map(([k]) => P[k]).filter(p => p && PAC[p.k].g === g && (p.oMO + p.oMAT + p.oSV + p.r) > 0.5);
+    if (!ps.length) continue;
+    const gt = ps.reduce((a, p) => ({ oMO:a.oMO + p.oMO, oMAT:a.oMAT + p.oMAT, oSV:a.oSV + p.oSV, r:a.r + p.r }), { oMO:0, oMAT:0, oSV:0, r:0 });
+    for (const k in tot) tot[k] += gt[k];
+    const go = gt.oMO + gt.oMAT + gt.oSV;
+    linhas += `<tr class="grp"><td colspan="5">${esc(gnome)}</td><td class="num">${cel(gt.oMO)}</td><td class="num">${cel(gt.oMAT)}</td><td class="num">${cel(gt.oSV)}</td><td class="num"><b>${cel(go)}</b></td><td class="num">${cel(gt.r)}</td><td class="num">${K(go - gt.r)}</td></tr>`;
+    for (const p of ps) {
+      const o = p.oMO + p.oMAT + p.oSV, s = o - p.r, k = 'p_' + p.k, ab = S.pcExp || S.open[k];
+      const ls = [...p.lin.values()].sort((a, b) => (b.mo + b.mat + b.sv) - (a.mo + a.mat + a.sv));
+      linhas += `<tr class="sub click" data-tog="${k}" aria-expanded="${!!ab}"><td colspan="5">${ab ? '▾' : '▸'} <b>${esc(PAC[p.k].nome)}</b> <small class="muted">${ls.length} ${ls.length === 1 ? 'serviço' : 'serviços'}</small></td>
+        <td class="num"><b>${cel(p.oMO)}</b></td><td class="num">${cel(p.oMAT)}</td><td class="num">${cel(p.oSV)}</td><td class="num"><b>${cel(o)}</b></td><td class="num">${cel(p.r)}</td><td class="num" style="${s < -0.5 ? 'color:var(--bad)' : ''}">${K(s)}</td></tr>`;
+      if (!ab) continue;
+      if (PAC[p.k].nota) linhas += `<tr><td colspan="11" style="padding-left:26px" class="note">${esc(PAC[p.k].nota)}</td></tr>`;
+      linhas += ls.map(l => { const q = l.q || 0; const trs = [...l.trs].filter(t => t !== 'Geral');
+        return `<tr><td style="padding-left:26px" class="desc"><a href="#" data-comp="${esc(l.c)}" data-eid="${esc(l.eid)}" data-iid="${esc(l.iid)}">${esc(l.desc)}</a> <small class="muted mono">${esc(l.c)}${trs.length ? ' · ' + trs.join(', ') : ''}${l.trs.has('Geral') && trs.length ? ' + áreas comuns' : ''}</small></td>
+          <td>${esc(l.unid)}</td><td class="num">${nf2.format(q)}</td><td class="num"><b>${q ? un(l.mo / q) : '–'}</b></td><td class="num">${q ? un(l.mat / q) : '–'}</td>
+          <td class="num">${cel(l.mo)}</td><td class="num">${cel(l.mat)}</td><td class="num">${cel(l.sv)}</td><td class="num">${cel(l.mo + l.mat + l.sv)}</td><td colspan="2"></td></tr>`; }).join('');
+    }
+  }
+  const to = tot.oMO + tot.oMAT + tot.oSV;
+  return `<section class="card"><header><h2>Orçado por pacote de contratação</h2><span class="note">Use para negociar: cada pacote junta o que se contrata com um mesmo fornecedor, venha de que etapa vier. Abra o pacote para ver os serviços e quanto o orçamento prevê por unidade. <b>MO por un.</b> é o custo de mão de obra com encargos (o teto para uma empreitada só de mão de obra); <b>Material por un.</b> é o que fica por conta da obra. Valores sem BDI. O realizado vem da subetapa de cada lançamento.</span><span class="sp"></span>
+    <button class="btn" data-act="${S.pcExp ? 'pc-recolher' : 'pc-expandir'}">${S.pcExp ? 'Recolher pacotes' : 'Abrir todos os pacotes'}</button></header>
+    <div class="scroll"><table><thead>
+     <tr><th rowspan="2">Pacote / serviço</th><th rowspan="2">Un</th><th class="num" rowspan="2">Quantidade</th><th class="num" colspan="2" style="text-align:center">Por unidade (R$)</th><th class="num" colspan="4" style="text-align:center">Orçado (R$)</th><th class="num" rowspan="2">Realizado</th><th class="num" rowspan="2">Saldo</th></tr>
+     <tr><th class="num">MO por un.</th><th class="num">Material por un.</th><th class="num">Mão de obra</th><th class="num">Material</th><th class="num">Serviços</th><th class="num">Total</th></tr></thead><tbody>
+    ${linhas}
+    <tr class="tot"><td colspan="5">Total da obra</td><td class="num">${K(tot.oMO)}</td><td class="num">${K(tot.oMAT)}</td><td class="num">${K(tot.oSV)}</td><td class="num">${K(to)}</td><td class="num">${K(tot.r)}</td><td class="num">${K(to - tot.r)}</td></tr></tbody></table></div></section>`;
+}
+
 async function viewHist(){
   const es = []; for (const d of Object.values(S.hist)) for (const [id, e] of Object.entries(d.l || {})) es.push(e);
   es.sort((a, b) => (b.t || '').localeCompare(a.t || ''));
@@ -831,6 +943,7 @@ async function render(){
     case 'insumos': h = viewIns(); break;
     case 'cronograma': h = viewCrono(); break;
     case 'ff': h = viewFF(); break;
+    case 'contrat': h = viewContrat(); break;
     case 'realizado': h = viewReal(); break;
     case 'historico': h = await viewHist(); if (seq !== renderSeq) return; break;
   }
@@ -952,6 +1065,10 @@ async function exportar(){
   let ac = 0; add('Físico-Financeiro', [['Etapa', ...M.meses.map(mesLab)], ...ets.map(e => [e.n + ' ' + e.nome, ...M.meses.map(mm => (M.ffEt[e.n] || {})[mm] || 0)]), ['Previsto no mês', ...M.meses.map(mm => M.ffTot[mm])], ['Previsto acumulado', ...M.meses.map(mm => (ac += M.ffTot[mm]))], ['Realizado no mês', ...M.meses.map(mm => M.realMes[mm] || 0)]]);
   add('Realizado', [['Data', 'Tipo', 'Atividade', 'Subetapa', 'Categoria', 'Descrição', 'Fornecedor', 'Documento', 'Valor (R$)', 'Observação'], ...M.lanc.map(x => [br(x.l.data), x.l.tp === 'M' ? 'Medição' : 'Compra', x.l.at, x.sb, x.cat === 'MIX' ? 'MO + material' : catNome(x.cat), x.l.d, x.l.fo, x.l.doc, x.l.v, x.l.o])]);
   add('Orçado x realizado', [['Etapa', 'Subetapa', 'Orçado MO', 'Orçado material', 'Orçado serviços', 'Orçado total', 'Realizado MO', 'Realizado material', 'Realizado serviços', 'Realizado total', 'Saldo'], ...Object.keys(M.rs).map(Number).sort((a, b) => a - b).flatMap(n => Object.entries(M.rs[n]).map(([sb, g]) => { const o = g.oMO + g.oMAT + g.oSV, r = g.rMO + g.rMAT + g.rSV; return [n ? n + ' ' + ((M.etapas[n] || {}).nome || '') : 'Sem atividade', sb, g.oMO, g.oMAT, g.oSV, o, g.rMO, g.rMAT, g.rSV, r, o - r]; }))]);
+  const PK = pacotes(); const gN = Object.fromEntries(GRUPOS);
+  add('Contratação', [['Grupo', 'Pacote', 'Código', 'Descrição', 'Unid', 'Quantidade', 'MO por un. (R$)', 'Material por un. (R$)', 'Orçado MO (R$)', 'Orçado material (R$)', 'Orçado serviços (R$)', 'Orçado total (R$)', 'Realizado (R$)'],
+    ...PACOTES.map(([k]) => PK[k]).filter(Boolean).flatMap(p => { const pc = PAC[p.k]; return [[gN[pc.g], pc.nome, '', '', '', '', '', '', p.oMO, p.oMAT, p.oSV, p.oMO + p.oMAT + p.oSV, p.r],
+      ...[...p.lin.values()].map(l => [gN[pc.g], pc.nome, l.c, l.desc, l.unid, l.q, l.q ? l.mo / l.q : '', l.q ? l.mat / l.q : '', l.mo, l.mat, l.sv, l.mo + l.mat + l.sv, ''])]; })]);
   const buf = X.write(wb, { bookType: 'xlsx', type: 'array' });
   try { await dl.save({ filename: 'Madrid-Orcamento-Cronograma-' + today() + '.xlsx', data: new Uint8Array(buf) }); toast('Planilha salva.'); }
   catch (e) { if (e && e.code !== 'declined') toast('Não foi possível salvar a planilha.'); }
@@ -971,6 +1088,8 @@ document.addEventListener('click', async ev => {
   if (t.dataset.act === 'limpar') { S.oEt = ''; S.oTorre = ''; S.oSub = ''; S.q = ''; render(); return; }
   if (t.dataset.act === 'expandir') { S.exp = true; render(); return; }
   if (t.dataset.act === 'or-expandir') { S.orExp = true; render(); return; }
+  if (t.dataset.act === 'pc-expandir') { S.pcExp = true; render(); return; }
+  if (t.dataset.act === 'pc-recolher') { S.pcExp = false; for (const k in S.open) if (k.startsWith('p_')) delete S.open[k]; render(); return; }
   if (t.dataset.act === 'or-recolher') { S.orExp = false; for (const k in S.open) if (k[0] === 'r') delete S.open[k]; render(); return; }
   if (t.dataset.act === 'recolher') { S.exp = false; S.open = {}; render(); return; }
   if (t.dataset.comp) { ev.preventDefault(); S.drawer = { c: t.dataset.comp, eid: t.dataset.eid || (S.drawer && S.drawer.eid), iid: t.dataset.iid || (S.drawer && S.drawer.iid) }; drawer(); return; }
