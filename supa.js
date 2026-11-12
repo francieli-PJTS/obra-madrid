@@ -205,7 +205,7 @@
       <form class="sx-linha" id="sx-add"><label>E-mail<input name="email" type="email" required></label><label>Nome<input name="nome"></label>
         <label>Acesso<select name="papel"><option value="leitor">Só acompanha</option><option value="editor">Pode editar</option></select></label><button class="sx-btn pri">Incluir</button></form>
       <p class="sx-msg">A pessoa incluída entra pelo endereço do app com o próprio e-mail. Quem só acompanha vê tudo, inclusive custos, mas não altera nada.</p>
-      <h2>Importar base</h2><p class="sx-msg">Só para a carga inicial ou para restaurar um backup: o arquivo .json da base e, se houver, as fotos com o nome original.</p>
+      <h2>Importar base ou ajustes</h2><p class="sx-msg">Arquivo de ajustes (preparado pela engenharia): junta as mudanças com o que já está no app, sem apagar nada. Arquivo de base completa: só para a carga inicial ou para restaurar um backup.</p>
       <div class="sx-linha"><label>Base (.json)<input type="file" id="sx-json" accept="application/json,.json"></label><label>Fotos<input type="file" id="sx-fotos" accept="image/*" multiple></label><button class="sx-btn pri" id="sx-imp">Importar</button></div>
       <div class="sx-msg" id="sx-impm"></div>` : ''}</div>`;
     document.body.appendChild(p);
@@ -231,8 +231,15 @@
       if (!fj && !fs.length) { m.textContent = 'Escolha o arquivo da base ou as fotos.'; return; }
       try {
         if (fj) {
-          const base = JSON.parse(await fj.text()); const linhas = Object.entries(base).map(([path, data]) => ({ path, data }));
-          for (let i = 0; i < linhas.length; i += 20) { m.textContent = `Gravando base: ${i} de ${linhas.length}…`; const { error } = await sb.from('docs').upsert(linhas.slice(i, i + 20)); if (error) throw error; }
+          const base = JSON.parse(await fj.text());
+          if (base && base._ajustes && base.docs) {
+            // arquivo de AJUSTES: junta só os campos informados com o que já existe (não apaga nada)
+            const ps = Object.entries(base.docs); let k = 0;
+            for (const [path, dados] of ps) { m.textContent = `Aplicando ajustes: ${++k} de ${ps.length}…`; const { error } = await sb.rpc('doc_juntar', { p_path: path, p_dados: dados }); if (error) throw error; }
+          } else {
+            const linhas = Object.entries(base).map(([path, data]) => ({ path, data }));
+            for (let i = 0; i < linhas.length; i += 20) { m.textContent = `Gravando base: ${i} de ${linhas.length}…`; const { error } = await sb.from('docs').upsert(linhas.slice(i, i + 20)); if (error) throw error; }
+          }
         }
         let n = 0;
         for (const f of fs) { m.textContent = `Enviando foto ${++n} de ${fs.length}…`; const id = f.name.replace(/\.[^.]+$/, ''); const { error } = await sb.storage.from('fotos').upload(id, await reduzir(f), { contentType: 'image/jpeg', upsert: true }); if (error) throw error; }
