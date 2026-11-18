@@ -191,6 +191,7 @@ input.e:disabled,select.e:disabled{background:transparent;border-color:transpare
 @media (max-width:640px){ .cr-semana{grid-template-columns:1fr} .cr-dia{min-height:0} .cr-cal button.d{min-height:56px} .cr-cal .cr-ev{display:none} .cr-cal .pts{display:flex} .cr-gl,.cr-gh{grid-template-columns:110px 1fr} }
 @media (max-width:640px){ .kpi .v{font-size:16px} .g-row,.g-head{grid-template-columns:150px 1fr} td.desc{min-width:200px} }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+td.cmp,th.cmp{background:var(--warn-weak)}
 </style>
 
 <div class="wrap">
@@ -221,7 +222,7 @@ input.e:disabled,select.e:disabled{background:transparent;border-color:transpare
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script><script>
 'use strict';
 // ---------- estado
-const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, hist:{},
+const S = { cfg:null, ins:{}, comps:{}, compDoc:{}, orc:{}, at:{}, lanc:{}, compr:{}, hist:{},
   got:{obra:false, comp:false, orc:false, lanc:false}, canEdit:false, uid:null,
   tab:'painel', open:{}, exp:false, oTorre:'', oEt:'', oSub:'', ffTorre:'', q:'', drawer:null, crView:'semana', crTorre:'', crEt:'', crSt:'', crRef:'', crQ:'', crConc:false, crDia:'', lnTp:'', lnMes:'', ffMode:'rs', insQ:'', fotos:{}, lb:null };
 let db = null, user = null, M = null, assetsNS = null;
@@ -351,6 +352,16 @@ function calc(){
     if (l.at) m.atReal[l.at] = (m.atReal[l.at] || 0) + v;
   }
   m.real = m.realM + m.realC;
+  // comprometido: saldo de contrato a medir e pedido a entregar (lido do Sienge; não entra no realizado)
+  m.compr = []; m.comp = 0;
+  for (const [did, doc] of Object.entries(S.compr)) for (const [cid, c] of Object.entries(doc.c || {})) {
+    if (c.x || !(c.v > 0)) continue;
+    const a = S.at[c.at]; const n = a ? etN(a.et) : 0;
+    const sb = c.sb || sbDominante(m, c.at, n) || 'Outros';
+    rsCel(m, n, sb).c += c.v; m.comp += c.v;
+    m.compr.push({ did, cid, c, n, sb, ok: !!a });
+  }
+  m.compr.sort((x, y) => y.c.v - x.c.v);
   m.lanc.sort((x, y) => (y.l.data || '').localeCompare(x.l.data || ''));
   for (const et of Object.values(m.etapas)) et.real = m.realEt[et.n] || 0;
   // cronograma
@@ -442,7 +453,7 @@ function pacoteDe(r){
   return PAC_COD[c] || PAC_COD[c.replace(/^M-/, '')] || PAC_SB[r.sb] || 'outros';
 }
 
-function rsCel(m, n, sb){ const e = m.rs[n] || (m.rs[n] = {}); return e[sb] || (e[sb] = { oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0 }); }
+function rsCel(m, n, sb){ const e = m.rs[n] || (m.rs[n] = {}); return e[sb] || (e[sb] = { oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0, c:0 }); }
 // subetapa do orçamento com mais custo ligada à atividade (de preferência na mesma etapa)
 function sbDominante(m, at, n){
   const t = m.atSb[at]; if (!t) return '';
@@ -904,7 +915,7 @@ function viewReal(){
   const atOpts = M.ats.map(a => `<option value="${esc(a.id)}">${esc(a.id)} · ${esc(a.tr)} · ${esc(a.nome.slice(0, 60))}</option>`).join('');
   return `${viewOR()}
    <div class="grid2">
-   <section class="card"><header><h2>Resumo do realizado</h2></header><div class="body note">Compras ${R0(M.realC)} · medições ${R0(M.realM)}. Lance aqui o que for pago ou entregue (contratos, medições e notas do Sienge). Cada lançamento tem subetapa e categoria (mão de obra, material ou serviços); quando vazias, a subetapa vem da atividade e a categoria vem do tipo (medição = mão de obra, compra = material).</div></section>
+   <section class="card"><header><h2>Resumo do realizado</h2></header><div class="body note">Compras ${R0(M.realC)} · medições ${R0(M.realM)} · <b>comprometido ${R0(M.comp)}</b> (a medir ou a entregar) · realizado + comprometido ${R0(M.real + M.comp)}. Lance aqui o que for pago ou entregue (contratos, medições e notas do Sienge). Cada lançamento tem subetapa e categoria (mão de obra, material ou serviços); quando vazias, a subetapa vem da atividade e a categoria vem do tipo (medição = mão de obra, compra = material).</div></section>
    ${S.canEdit ? `<section class="card"><header><h2>Novo lançamento</h2></header><form class="body form" data-novolanc>
      <label>Tipo<select name="tp"><option value="M">Medição de contrato</option><option value="C">Compra de material</option></select></label>
      <label>Data<input name="data" type="date" value="${today()}" required></label>
@@ -916,6 +927,7 @@ function viewReal(){
      <label>Fornecedor<input name="fo"></label><label>Nº medição / NF / pedido<input name="doc"></label>
      <label class="wide">Observação<input name="o"></label><div><button class="btn pri">Lançar</button></div></form></section>` : ''}
   </div>
+  ${viewCompr()}
   <section class="card"><header><h2>Lançamentos</h2><span class="pill p-mut">${l.length}</span><span class="sp"></span><div class="f">
     <select id="lnTp" aria-label="Tipo"><option value="">Compras e medições</option><option value="M" ${S.lnTp === 'M' ? 'selected' : ''}>Medições</option><option value="C" ${S.lnTp === 'C' ? 'selected' : ''}>Compras</option></select>
     <select id="lnMes" aria-label="Mês"><option value="">Todos os meses</option>${meses.map(mm => `<option value="${mm}" ${S.lnMes === mm ? 'selected' : ''}>${mesLab(mm)}</option>`).join('')}</select></div></header>
@@ -928,6 +940,18 @@ function viewReal(){
      <td style="width:130px">${ed('ln', k, 'v', x.l.v, {num:true, w:120, label:'Valor'})}</td><td>${S.canEdit ? `<button class="btn sm del" data-dellanc="${x.mid}|${x.lid}">Excluir</button>` : ''}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty">Nenhum lançamento neste filtro.</div>'}</section>`;
 }
 
+// comprometido: contratos com saldo a medir e pedidos com saldo a entregar
+function viewCompr(){
+  const l = M.compr; if (!l.length) return '';
+  const ab = !S.open.comprF; // aberto por padrão; o clique fecha
+  const lida = Object.values(S.compr).map(d => d.lido || '').sort().pop();
+  return `<section class="card"><header><h2 class="click" data-tog="comprF" aria-expanded="${!!ab}">${ab ? '▾' : '▸'} Comprometido (a medir / a entregar)</h2><span class="pill p-warn">${R0(M.comp)}</span><span class="pill p-mut">${l.length}</span><span class="sp"></span><span class="note">${lida ? 'Sienge lido em ' + br(lida) + '. ' : ''}Não entra no realizado: vira lançamento quando for medido ou entregue.</span></header>
+   ${ab ? `<div class="scroll"><table><thead><tr><th>Documento</th><th>Fornecedor</th><th>Objeto</th><th>Atividade</th><th>Subetapa</th><th class="num">Contratado / pedido</th><th class="num">Já medido / entregue</th><th class="num">Comprometido</th><th>Obs.</th></tr></thead><tbody>
+   ${l.map(x => `<tr><td class="mono">${esc(x.c.doc)}</td><td>${esc(x.c.fo || '')}</td><td class="desc">${esc(x.c.d || '')}</td><td class="mono">${esc(x.c.at || '')}${x.ok ? '' : ' <small class="pill p-warn">sem atividade</small>'}</td><td>${esc(x.sb)}</td>
+     <td class="num">${K(x.c.tot || 0)}</td><td class="num">${K(x.c.med || 0)}</td><td class="num cmp"><b>${K(x.c.v)}</b></td><td class="note">${esc(x.c.o || '')}</td></tr>`).join('')}
+   <tr class="tot"><td colspan="7">Total comprometido</td><td class="num cmp">${K(M.comp)}</td><td></td></tr></tbody></table></div>` : ''}</section>`;
+}
+
 function catSel(k, x){
   const id = ['ln', ...k, 'cat'].join('__').replace(/[^A-Za-z0-9_-]/g, '_');
   const opts = (x.cat === 'MIX' ? [['MIX', 'MO + material']] : []).concat(CATS);
@@ -937,26 +961,27 @@ function catSel(k, x){
 function viewOR(){
   const ns = Object.keys(M.rs).map(Number).sort((a, b) => (a || 99) - (b || 99));
   const nome = n => n ? pad(n) + ' · ' + ((M.etapas[n] || {}).nome || 'Etapa ' + n) : 'Sem atividade válida';
-  const z = () => ({ oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0 });
-  const add = (a, b) => { for (const k in a) a[k] += b[k]; return a; };
+  const z = () => ({ oMO:0, oMAT:0, oSV:0, rMO:0, rMAT:0, rSV:0, c:0 });
+  const add = (a, b) => { for (const k in a) a[k] += b[k] || 0; return a; };
   const tot = z();
   const cel = v => Math.abs(v) < 0.5 ? '<span class="muted">–</span>' : K(v);
-  const cols = (g, cls) => { const o = g.oMO + g.oMAT + g.oSV, r = g.rMO + g.rMAT + g.rSV, s = o - r;
+  const cols = (g, cls) => { const o = g.oMO + g.oMAT + g.oSV, r = g.rMO + g.rMAT + g.rSV, rc = r + g.c, s = o - rc;
     return `<td class="num">${cel(g.oMO)}</td><td class="num">${cel(g.oMAT)}</td><td class="num">${cel(g.oSV)}</td><td class="num"><b>${cel(o)}</b></td>
       <td class="num" style="${g.rMO > g.oMO + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rMO)}</td><td class="num" style="${g.rMAT > g.oMAT + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rMAT)}</td><td class="num" style="${g.rSV > g.oSV + 0.5 ? 'color:var(--bad)' : ''}">${cel(g.rSV)}</td><td class="num"><b>${cel(r)}</b></td>
-      <td class="num" style="${s < -0.5 ? 'color:var(--bad)' : ''}">${K(s)}</td><td class="num">${o ? P(r / o) : (r ? '<span class="pill p-bad">sem orçado</span>' : '')}</td>`; };
+      <td class="num cmp">${cel(g.c)}</td><td class="num cmp" style="${rc > o + 0.5 ? 'color:var(--bad)' : ''}"><b>${cel(rc)}</b></td>
+      <td class="num" style="${s < -0.5 ? 'color:var(--bad)' : ''}">${K(s)}</td><td class="num">${o ? P(rc / o) : (rc ? '<span class="pill p-bad">sem orçado</span>' : '')}</td>`; };
   let linhas = '';
   for (const n of ns) {
-    const subs = Object.entries(M.rs[n]).sort((a, b) => (b[1].oMO + b[1].oMAT + b[1].oSV) - (a[1].oMO + a[1].oMAT + a[1].oSV));
+    const subs = Object.entries(M.rs[n]).sort((a, b) => (b[1].oMO + b[1].oMAT + b[1].oSV + b[1].c) - (a[1].oMO + a[1].oMAT + a[1].oSV + a[1].c));
     const ge = subs.reduce((acc, [, g]) => add(acc, g), z()); add(tot, ge);
     const k = 'r' + n, ab = S.orExp || S.open[k];
     linhas += `<tr class="grp click" data-tog="${k}" aria-expanded="${!!ab}"><td>${ab ? '▾' : '▸'} ${esc(nome(n))}</td>${cols(ge)}</tr>`;
     if (ab) linhas += subs.map(([sb, g]) => `<tr><td style="padding-left:26px">${esc(sb)}</td>${cols(g)}</tr>`).join('');
   }
-  return `<section class="card"><header><h2>Orçado × realizado por subetapa</h2><span class="note">Valores em R$. Mão de obra, material e serviços saem dos insumos das composições (orçado) e da categoria de cada lançamento (realizado). Clique numa etapa para abrir as subetapas. Vermelho = realizado acima do orçado.</span><span class="sp"></span>
+  return `<section class="card"><header><h2>Orçado × realizado × comprometido</h2><span class="note">Valores em R$. Mão de obra, material e serviços saem dos insumos das composições (orçado) e da categoria de cada lançamento (realizado). <b>Comprometido</b> = saldo de contrato ainda a medir + pedido ainda a entregar (Sienge). <b>Saldo livre</b> = orçado − realizado − comprometido. Clique numa etapa para abrir as subetapas. Vermelho = acima do orçado.</span><span class="sp"></span>
     <button class="btn" data-act="${S.orExp ? 'or-recolher' : 'or-expandir'}">${S.orExp ? 'Recolher subetapas' : 'Abrir todas as subetapas'}</button></header>
     <div class="scroll"><table><thead>
-     <tr><th rowspan="2">Etapa / subetapa</th><th class="num" colspan="4" style="text-align:center">Orçado</th><th class="num" colspan="4" style="text-align:center">Realizado</th><th class="num" rowspan="2">Saldo</th><th class="num" rowspan="2">%</th></tr>
+     <tr><th rowspan="2">Etapa / subetapa</th><th class="num" colspan="4" style="text-align:center">Orçado</th><th class="num" colspan="4" style="text-align:center">Realizado</th><th class="num cmp" rowspan="2">Comprometido</th><th class="num cmp" rowspan="2">Realizado + comprometido</th><th class="num" rowspan="2">Saldo livre</th><th class="num" rowspan="2">% do orçado</th></tr>
      <tr><th class="num">Mão de obra</th><th class="num">Material</th><th class="num">Serviços</th><th class="num">Total</th><th class="num">Mão de obra</th><th class="num">Material</th><th class="num">Serviços</th><th class="num">Total</th></tr></thead><tbody>
     ${linhas}
     <tr class="tot"><td>Total da obra</td>${cols(tot)}</tr></tbody></table></div></section>`;
@@ -1024,7 +1049,7 @@ function resumoIA(){
   const L = [], cfg = S.cfg || {};
   L.push(`Obra: ${cfg.nome || 'Residencial Madrid'} · ${cfg.empresa || ''} · ${cfg.local || ''} · ${cfg.unidades || 60} unidades · área ${n2(cfg.area)} m² · referência de preços ${cfg.refPreco || ''}`);
   L.push(`Custo sem BDI R$ ${n0(M.total)} (diretos ${n0(M.diretos)}, indiretos ${n0(M.indiretos)}) · meta sem BDI R$ ${n0(M.meta)} · BDI ${(M.bdi * 100).toFixed(2)}% · preço com BDI R$ ${n0(M.preco)}`);
-  L.push(`Realizado total R$ ${n0(M.real)} (medições ${n0(M.realM)}, compras ${n0(M.realC)}) · avanço físico ${(M.fis * 100).toFixed(1)}% · previsto para hoje ${(M.prevHj * 100).toFixed(1)}% · fim do cronograma ${br(M.fimObra)}`);
+  L.push(`Realizado total R$ ${n0(M.real)} (medições ${n0(M.realM)}, compras ${n0(M.realC)}) · comprometido a medir/entregar R$ ${n0(M.comp)} (${M.compr.map(x => `${x.c.doc} ${x.c.fo || ''} ativ. ${x.c.at || '?'} R$ ${n0(x.c.v)}`).join('; ')}) ·avanço físico ${(M.fis * 100).toFixed(1)}% · previsto para hoje ${(M.prevHj * 100).toFixed(1)}% · fim do cronograma ${br(M.fimObra)}`);
   L.push('', '## Pacotes de contratação (orçado sem BDI; serviços: código | descrição | un | quantidade | MO por un. | material por un. | MO total | material total | serviços | total)');
   const PK = pacotes(); const gN = Object.fromEntries(GRUPOS);
   for (const [k] of PACOTES) { const p = PK[k]; if (!p) continue; const o = p.oMO + p.oMAT + p.oSV;
@@ -1393,6 +1418,7 @@ async function boot(){
   db.collection('comp').onSnapshot(s => { const c = {}, w = {}; for (const d of s.docs) for (const [k, v] of Object.entries((d.data() || {}).comps || {})) { c[k] = v; w[k] = d.id; } S.comps = c; S.compDoc = w; dlCache = ''; S.got.comp = true; later(); }, err);
   db.collection('orc').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.orc = o; S.got.orc = true; later(); }, err);
   db.collection('lanc').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.lanc = o; S.got.lanc = true; later(); }, err);
+  db.collection('compr').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.compr = o; later(); }, err);
   db.collection('fotos').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.fotos = o; if (S.tab === 'fotos' || S.lb) later(); }, err);
   if (S.canEdit) claude.use('assets').then(a => { assetsNS = a; if (S.tab === 'fotos') later(); });
   db.collection('hist').onSnapshot(s => { const o = {}; for (const d of s.docs) o[d.id] = d.data(); S.hist = o; if (S.tab === 'historico') later(); }, err);
